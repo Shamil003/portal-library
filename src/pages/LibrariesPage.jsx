@@ -9,7 +9,7 @@ import talasImg from '../assets/images/talas.png';
 import chuyImg from '../assets/images/chuy.png';
 import IKImg from '../assets/images/IK.png';
 
-// Отдельный компонент для детальной страницы региона (как на скриншоте)
+
 const RegionDetailPage = ({ region, onBack }) => {
   const librariesList = [
     { name: "Баялинов а китепкана", status: "отчет даяр эмес", badge: "4 / 5", isReady: false },
@@ -28,7 +28,7 @@ const RegionDetailPage = ({ region, onBack }) => {
 
   return (
     <div>
-      {/* Хлебные крошки */}
+     
       <div className="flex items-center gap-2 text-sm mb-6 text-gray-500 font-medium">
         <span 
           onClick={onBack} 

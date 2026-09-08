@@ -2,7 +2,7 @@ import React from 'react';
 import { Library, Search } from 'lucide-react';
 
 export const RegionDetailPage = ({ region, onBack }) => {
-  // Пример списка библиотек для этой области
+
   const librariesList = [
     { name: "Баланчаев Баланча а. китепкана", status: "отчет даяр эмес", badge: "4 / 5", isReady: false },
     { name: "Китепкананын аты", status: "отчет даяр", badge: "1 / 1", isReady: true },
@@ -20,7 +20,7 @@ export const RegionDetailPage = ({ region, onBack }) => {
 
   return (
     <div>
-      {/* Хлебные крошки (навигация) */}
+
       <div className="flex items-center gap-2 text-sm mb-6 text-gray-500 font-medium">
         <span 
           onClick={onBack} 
