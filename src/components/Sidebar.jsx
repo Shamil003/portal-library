@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FileText, BarChart2, MapPin, Settings, Library } from 'lucide-react';
+import { Home, FileText, BarChart2, MapPin, Settings, Library, Dog, Cat} from 'lucide-react';
 import gerbLogo from '../assets/gerb.svg';
 
 export const Sidebar = ({ activeTab, setActiveTab }) => {
@@ -11,6 +11,9 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
     { id: 'map', label: 'Карта', icon: MapPin },
     { id: 'settings', label: 'Жөндөмөлөр', icon: Settings },
     { id: 'libraries', label: 'Китепканалар', icon: Library },
+    {id: 'library', label: 'library', icon: Dog},
+    {id: 'another', label: 'another', icon: Cat}
+    
   ];
 
   return (

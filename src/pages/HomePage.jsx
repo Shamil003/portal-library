@@ -1,4 +1,3 @@
-import React from 'react';
 import { Upload, FileCheck } from 'lucide-react';
 
 export const HomePage = () => {

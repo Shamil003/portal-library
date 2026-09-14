@@ -1,4 +1,3 @@
-import React from 'react';
 import { Library, Search } from 'lucide-react';
 
 export const RegionDetailPage = ({ region, onBack }) => {
@@ -32,7 +31,6 @@ export const RegionDetailPage = ({ region, onBack }) => {
         <span className="text-slate-800 font-bold">{region?.name || "Ош облусу"}</span>
       </div>
 
-      {/* Верхние блоки (как на фото) */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
           <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-4 text-blue-700">
