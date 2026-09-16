@@ -23,10 +23,7 @@ export const Modal = ({ setUser }) => {
     const correctEmail = "test@gmail.com";
     const correctPassword = "123456";
 
-    if (
-      email === correctEmail &&
-      password === correctPassword
-    ) {
+    if (email === correctEmail && password === correctPassword) {
       const user = {
         name: "Brad Pitt",
         email: email,
@@ -34,20 +31,15 @@ export const Modal = ({ setUser }) => {
         image: Userimg,
       };
 
-      // Передаем пользователя в App
       setUser(user);
 
-      // Закрываем модальное окно
       setIsOpen(false);
 
-      // Очищаем форму
       setEmail("");
       setPassword("");
       setError("");
 
-      // Переходим в профиль
       navigate("/profile");
-
     } else {
       setError("Неверная почта или пароль");
     }
@@ -55,26 +47,22 @@ export const Modal = ({ setUser }) => {
 
   return (
     <>
-      {/* Кнопка входа */}
-
       <button
         onClick={() => {
           setIsOpen(true);
           setError("");
         }}
-        className="px-5 py-3 bg-[#1C3458] text-white rounded-[10px] cursor-pointer"
+        className="px-5 py-3 bg-[#1C3458] text-white rounded-[10px] cursor-pointer   transition-all
+  duration-200
+  hover:scale-105
+  active:scale-95"
       >
         Войти
       </button>
 
-      {/* Модальное окно */}
-
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-
           <div className="relative w-[650px] h-[620px] bg-[#1C3458] rounded-[5px] p-[50px] text-white">
-
-            {/* Логотип */}
 
             <div className="flex justify-center">
               <img
@@ -84,7 +72,6 @@ export const Modal = ({ setUser }) => {
               />
             </div>
 
-            {/* Заголовок */}
 
             <h1 className="mt-[24px] text-center text-[22px] leading-[27px] font-bold">
               КЫРГЫЗ РЕСПУБЛИКАСЫНЫН
@@ -92,17 +79,11 @@ export const Modal = ({ setUser }) => {
               КИТЕПКАНАЛАР ПОРТАЛЫ
             </h1>
 
-            {/* Подзаголовок */}
 
-            <p className="mt-[24px] text-center text-[16px]">
-              Аккаунтка кирүү
-            </p>
+            <p className="mt-[24px] text-center text-[16px]">Аккаунтка кирүү</p>
 
-            {/* Форма */}
 
             <div className="flex flex-col gap-[25px]">
-
-              {/* Почта */}
 
               <input
                 type="email"
@@ -115,10 +96,7 @@ export const Modal = ({ setUser }) => {
                 className="w-full h-[40px] bg-transparent border-b-2 border-white outline-none text-white placeholder:text-white placeholder:opacity-90"
               />
 
-              {/* Пароль */}
-
               <div>
-
                 <input
                   type="password"
                   value={password}
@@ -135,18 +113,14 @@ export const Modal = ({ setUser }) => {
                     Сыр сөздү унуттуңузбу?
                   </button>
                 </div>
-
               </div>
 
-              {/* Ошибка */}
 
               {error && (
                 <p className="text-red-300 text-[13px] text-center -mt-[10px]">
                   {error}
                 </p>
               )}
-
-              {/* Войти */}
 
               <button
                 onClick={handleLogin}
@@ -158,10 +132,7 @@ export const Modal = ({ setUser }) => {
               <p className="cursor-pointer text-center text-[11px] -mt-[12px]">
                 Аккаунтуңуз жокпу?
               </p>
-
             </div>
-
-            {/* Закрыть */}
 
             <button
               onClick={() => setIsOpen(false)}
@@ -169,9 +140,7 @@ export const Modal = ({ setUser }) => {
             >
               ×
             </button>
-
           </div>
-
         </div>
       )}
     </>

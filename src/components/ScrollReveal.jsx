@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const SmoothScroll = ({ children }) => {
+const ScrollReveal = ({ children }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -8,37 +8,31 @@ const SmoothScroll = ({ children }) => {
       "[data-scroll-reveal]"
     );
 
-    const handleScroll = () => {
-      elements.forEach((element) => {
-        const rect = element.getBoundingClientRect();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("scroll-reveal-visible");
 
-        const windowHeight = window.innerHeight;
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.15,
+      }
+    );
 
-        // Насколько элемент вошёл в экран
-        const progress =
-          1 - (rect.top - windowHeight * 0.8) / (windowHeight * 0.5);
-
-        const value = Math.min(Math.max(progress, 0), 1);
-
-        element.style.opacity = value;
-        element.style.transform = `
-          translateY(${40 - value * 40}px)
-        `;
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
+    elements.forEach((element) => {
+      observer.observe(element);
     });
 
-    handleScroll();
-
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
     };
   }, []);
 
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default SmoothScroll;
+export default ScrollReveal;

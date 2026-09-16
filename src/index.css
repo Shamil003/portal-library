@@ -1,1 +1,13 @@
 @import "tailwindcss"; 
+[data-scroll-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+[data-scroll-reveal].scroll-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -11,6 +11,7 @@ const tabToPath = {
   library: "/library",
   another: "/another",
   profile: "/profile",
+  map: "Map",
 };
 
 const pathToTab = {
@@ -19,35 +20,38 @@ const pathToTab = {
   "/library": "library",
   "/another": "another",
   "/profile": "profile",
+  "/map": "Map",
 };
 
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Определяем активную вкладку по URL
   const activeTab = pathToTab[location.pathname] || "home";
 
-  // Получаем пользователя из localStorage
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
 
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  // Переключение страниц через Sidebar
   const handleTabChange = (tab) => {
-    navigate(tabToPath[tab]);
+    const path = tabToPath[tab];
+
+    if (!path) {
+      console.error("Неизвестная вкладка:", tab);
+      return;
+    }
+
+    navigate(path);
   };
 
-  // Авторизация
   const handleLogin = (userData) => {
     setUser(userData);
 
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // Выход
   const handleLogout = () => {
     setUser(null);
 
@@ -58,14 +62,12 @@ const App = () => {
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-800 font-sans overflow-hidden">
-
       <Sidebar
         activeTab={activeTab}
         setActiveTab={handleTabChange}
       />
 
       <main className="flex-1 p-8 overflow-y-auto">
-
         <Header
           user={user}
           setUser={handleLogin}
@@ -73,9 +75,7 @@ const App = () => {
         />
 
         <Router user={user} />
-
       </main>
-
     </div>
   );
 };

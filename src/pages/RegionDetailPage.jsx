@@ -45,7 +45,6 @@ export const RegionDetailPage = ({ region, onBack }) => {
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm"></div>
       </div>
 
-      {/* Поиск */}
       <div className="relative mb-6">
         <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
           <Search size={18} />
@@ -57,7 +56,6 @@ export const RegionDetailPage = ({ region, onBack }) => {
         />
       </div>
 
-      {/* Список библиотек */}
       <div className="space-y-3">
         {librariesList.map((lib, index) => (
           <div 
