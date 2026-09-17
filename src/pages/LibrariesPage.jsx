@@ -140,7 +140,7 @@ export const LibrariesPage = () => {
     },
   ];
 
-  // Если карточка выбрана, отображаем детальную страницу
+  // Если карточка выбрана, отображаем детаdeльную страницу
   if (selectedRegion) {
     return <RegionDetailPage region={selectedRegion} onBack={() => setSelectedRegion(null)} />;
   }
