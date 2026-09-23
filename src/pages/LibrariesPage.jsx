@@ -90,6 +90,10 @@ const RegionDetailPage = ({ region, onBack }) => {
     },
   ];
 
+  const filteredLibraries = librariesList.filter((lib) =>
+    lib.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <div className="flex items-center gap-2 text-sm mb-6 text-gray-500 font-medium">
@@ -128,14 +132,13 @@ const RegionDetailPage = ({ region, onBack }) => {
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm"></div>
       </div>
 
-      {/* Поиск */}
       <AnimatedSearch
         value={search}
         onChange={setSearch}
       />
 
-      <div className="space-y-3">
-        {librariesList.map((lib, index) => (
+      <div className="space-y-3 mt-4">
+        {filteredLibraries.map((lib, index) => (
           <div
             key={index}
             className="
@@ -167,11 +170,18 @@ const RegionDetailPage = ({ region, onBack }) => {
               </span>
 
               <span
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold ${
-                  lib.isReady
-                    ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                    : "bg-slate-50 text-slate-600 border border-slate-200"
-                }`}
+                className={`
+                  px-4
+                  py-1.5
+                  rounded-full
+                  text-xs
+                  font-semibold
+                  ${
+                    lib.isReady
+                      ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                      : "bg-slate-50 text-slate-600 border border-slate-200"
+                  }
+                `}
               >
                 {lib.badge}
               </span>
@@ -239,6 +249,10 @@ export const LibrariesPage = () => {
     );
   }
 
+  const filteredRegions = regions.filter((reg) =>
+    reg.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-6">
@@ -266,8 +280,8 @@ export const LibrariesPage = () => {
         onChange={setSearch}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {regions.map((reg, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        {filteredRegions.map((reg, index) => (
           <div
             key={index}
             onClick={() => setSelectedRegion(reg)}
@@ -312,18 +326,26 @@ export const LibrariesPage = () => {
                 top-0
                 bottom-0
                 w-1/2
-                bg-cover
-                bg-center
+                overflow-hidden
                 rounded-r-2xl
-                transition-transform
-                duration-700
-                ease-out
-                group-hover:scale-105
               "
-              style={{
-                backgroundImage: `url(${reg.image})`,
-              }}
             >
+              <img
+                src={reg.image}
+                alt={reg.name}
+                loading="eager"
+                decoding="async"
+                className="
+                  w-full
+                  h-full
+                  object-cover
+                  transition-transform
+                  duration-700
+                  ease-out
+                  group-hover:scale-105
+                "
+              />
+
               <div
                 className="
                   absolute
@@ -336,9 +358,8 @@ export const LibrariesPage = () => {
                   duration-500
                   ease-in-out
                   group-hover:opacity-0
-                  opacity-100
                 "
-              ></div>
+              />
             </div>
           </div>
         ))}

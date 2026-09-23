@@ -12,6 +12,7 @@ const tabToPath = {
   another: "/another",
   profile: "/profile",
   map: "Map",
+  rep: 'Rep'
 };
 
 const pathToTab = {
@@ -21,6 +22,7 @@ const pathToTab = {
   "/another": "another",
   "/profile": "profile",
   "/map": "Map",
+  "/rep": "rep"
 };
 
 const App = () => {

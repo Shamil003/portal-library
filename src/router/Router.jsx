@@ -8,6 +8,7 @@ import AnotherPage from "../pages/AnotherPage/AnotherPage";
 
 import PageTransition from "../components/PageTransition";
 import { Map } from "../pages/Map/Map";
+import ReportPage from "../pages/Report/ReportPage";
 
 export const Router = ({ user }) => {
   return (
@@ -62,6 +63,15 @@ export const Router = ({ user }) => {
         element={
           <PageTransition>
             <Map/>
+          </PageTransition>
+        }
+      />
+
+      <Route
+        path="/rep"
+        element={
+          <PageTransition>
+            <ReportPage/>
           </PageTransition>
         }
       />

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import gerbLogo from "../assets/gerb.svg";
-import Userimg from "../assets/images/Brad-Pitt-2 1.png";
+import Userimg from "../assets/images/library.png";
 
 export const Modal = ({ setUser }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +25,7 @@ export const Modal = ({ setUser }) => {
 
     if (email === correctEmail && password === correctPassword) {
       const user = {
-        name: "Brad Pitt",
+        name: "Library",
         email: email,
         position: "китепканачы",
         image: Userimg,

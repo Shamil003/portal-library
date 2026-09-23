@@ -1,3 +1,4 @@
+import Notifications from "../pages/Notifications/Notifications";
 import { Modal } from "./Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +11,7 @@ export const Header = ({ user, setUser, onLogout }) => {
 
   return (
     <header className="flex justify-end items-center gap-4 bg-white px-8 py-4 border-b border-gray-100 shadow-sm -mx-8 -mt-8 mb-8">
+      <Notifications/>
       {user ? (
         <div className="flex items-center gap-3">
           <button
