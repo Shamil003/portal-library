@@ -8,8 +8,6 @@ import { Router } from "./router/Router";
 const tabToPath = {
   home: "/",
   libraries: "/libraries",
-  library: "/library",
-  another: "/another",
   profile: "/profile",
   map: "Map",
   rep: 'Rep'
@@ -18,8 +16,6 @@ const tabToPath = {
 const pathToTab = {
   "/": "home",
   "/libraries": "libraries",
-  "/library": "library",
-  "/another": "another",
   "/profile": "profile",
   "/map": "Map",
   "/rep": "rep"

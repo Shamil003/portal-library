@@ -3,7 +3,7 @@ export const Profile = ({ user }) => {
     return (
       <div>
         <p className="text-red-500">
-          Вы не авторизованы
+          Сиз авторизациядан өткөн жоксуз
         </p>
       </div>
     );
@@ -11,7 +11,6 @@ export const Profile = ({ user }) => {
 
   return (
     <div className="flex items-center gap-[43px]">
-
       <div>
         <img
           src={user.image}
@@ -21,13 +20,11 @@ export const Profile = ({ user }) => {
       </div>
 
       <div>
-
         <h2 className="text-[14px] font-bold text-[#7B7B7B]">
           Профиль:
         </h2>
 
         <div className="mt-[5px]">
-
           <div>
             <p className="text-[10px] text-[#7B7B7B]">
               аты жөнү
@@ -40,7 +37,7 @@ export const Profile = ({ user }) => {
 
           <div>
             <p className="mt-[5px] text-[10px] text-[#7B7B7B]">
-              почта
+              электрондук почта
             </p>
 
             <p className="text-[17px] font-semibold text-[#434343]">
@@ -57,11 +54,8 @@ export const Profile = ({ user }) => {
               {user.position}
             </p>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 };

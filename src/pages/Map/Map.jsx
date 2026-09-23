@@ -3,7 +3,7 @@ import mapSvg from "./img/kg.svg?raw";
 
 const regionData = {
   KGB: {
-    name: "Баткенская область",
+    name: "Баткен облусу",
     label: "Баткен",
     color: "#E8A87C",
     libraries: 125,
@@ -12,8 +12,8 @@ const regionData = {
   },
 
   KGC: {
-    name: "Чуйская область",
-    label: "Чуй",
+    name: "Чүй облусу",
+    label: "Чүй",
     color: "#85C7DE",
     libraries: 215,
     users: 5340,
@@ -21,8 +21,8 @@ const regionData = {
   },
 
   KGJ: {
-    name: "Джалал-Абадская область",
-    label: "Джалал-Абад",
+    name: "Жалал-Абад облусу",
+    label: "Жалал-Абад",
     color: "#A8D5BA",
     libraries: 187,
     users: 4210,
@@ -30,7 +30,7 @@ const regionData = {
   },
 
   KGN: {
-    name: "Нарынская область",
+    name: "Нарын облусу",
     label: "Нарын",
     color: "#C3B1E1",
     libraries: 98,
@@ -39,7 +39,7 @@ const regionData = {
   },
 
   KGO: {
-    name: "Ошская область",
+    name: "Ош облусу",
     label: "Ош",
     color: "#F2C6DE",
     libraries: 234,
@@ -48,7 +48,7 @@ const regionData = {
   },
 
   KGT: {
-    name: "Таласская область",
+    name: "Талас облусу",
     label: "Талас",
     color: "#B8D8BA",
     libraries: 86,
@@ -57,8 +57,8 @@ const regionData = {
   },
 
   KGY: {
-    name: "Иссык-Кульская область",
-    label: "Иссык-Куль",
+    name: "Ысык-Көл облусу",
+    label: "Ысык-Көл",
     color: "#9EC5FE",
     libraries: 143,
     users: 3270,
@@ -66,7 +66,7 @@ const regionData = {
   },
 
   KGGB: {
-    name: "Бишкек",
+    name: "Бишкек шаары",
     label: "Бишкек",
     color: "#F6D186",
     libraries: 74,
@@ -75,7 +75,7 @@ const regionData = {
   },
 
   KGGO: {
-    name: "Ош",
+    name: "Ош шаары",
     label: "Ош",
     color: "#D4A5A5",
     libraries: 52,
@@ -86,22 +86,21 @@ const regionData = {
 
 export const Map = () => {
   const mapRef = useRef(null);
+  const regionsRef = useRef([]);
   const [selectedRegion, setSelectedRegion] = useState(null);
 
   useEffect(() => {
-    if (!mapRef.current) return;
+    const container = mapRef.current;
 
-    const svg = mapRef.current.querySelector("svg");
+    if (!container) return;
+
+    container.innerHTML = mapSvg;
+
+    const svg = container.querySelector("svg");
 
     if (!svg) return;
 
-    const regions = svg.querySelectorAll("path");
-
-    /*
-      ==========================================
-      СОЗДАЁМ НАЗВАНИЯ ОБЛАСТЕЙ
-      ==========================================
-    */
+    regionsRef.current = [];
 
     Object.entries(regionData).forEach(([id, data]) => {
       const region = svg.querySelector(`#${id}`);
@@ -115,39 +114,19 @@ export const Map = () => {
         "text"
       );
 
-      text.setAttribute(
-        "x",
-        box.x + box.width / 2
-      );
-
-      text.setAttribute(
-        "y",
-        box.y + box.height / 2
-      );
-
-      text.setAttribute(
-        "text-anchor",
-        "middle"
-      );
-
-      text.setAttribute(
-        "dominant-baseline",
-        "middle"
-      );
+      text.setAttribute("x", box.x + box.width / 2);
+      text.setAttribute("y", box.y + box.height / 2);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
 
       text.textContent = data.label;
 
       text.style.fontSize = "12px";
-      text.style.fontWeight = "600";
+      text.style.fontWeight = "700";
       text.style.fontFamily = "Arial, sans-serif";
       text.style.fill = "#1C3458";
       text.style.pointerEvents = "none";
       text.style.userSelect = "none";
-
-      /*
-        Белая обводка текста,
-        чтобы надпись была хорошо видна
-      */
       text.style.paintOrder = "stroke";
       text.style.stroke = "#ffffff";
       text.style.strokeWidth = "3px";
@@ -158,11 +137,7 @@ export const Map = () => {
       svg.appendChild(text);
     });
 
-    /*
-      ==========================================
-      НАСТРОЙКА ОБЛАСТЕЙ
-      ==========================================
-    */
+    const regions = svg.querySelectorAll("path");
 
     regions.forEach((region) => {
       const id = region.getAttribute("id");
@@ -170,35 +145,17 @@ export const Map = () => {
 
       if (!data) return;
 
-      /*
-        Если область выбрана
-        сохраняем её цвет,
-        но делаем КРАСНУЮ обводку
-      */
-      if (id === selectedRegion) {
-        region.style.fill = data.color;
-        region.style.stroke = "#EF4444";
-        region.style.strokeWidth = "4";
-        region.style.filter =
-          "drop-shadow(0px 4px 7px rgba(239, 68, 68, 0.35))";
-      } else {
-        region.style.fill = data.color;
-        region.style.stroke = "#ffffff";
-        region.style.strokeWidth = "1";
-        region.style.filter = "none";
-      }
-
-      region.style.cursor = "pointer";
+      region.style.fill = data.color;
+      region.style.stroke = "#ffffff";
+      region.style.strokeWidth = "1";
       region.style.opacity = "1";
+      region.style.cursor = "pointer";
+      region.style.filter = "none";
 
-      /*
-        Плавная анимация
-      */
       region.style.transition = `
         fill 0.25s ease,
         stroke 0.25s ease,
         stroke-width 0.25s ease,
-        opacity 0.25s ease,
         filter 0.25s ease,
         transform 0.25s ease
       `;
@@ -206,9 +163,8 @@ export const Map = () => {
       region.style.transformBox = "fill-box";
       region.style.transformOrigin = "center";
 
-
       const handleMouseEnter = () => {
-        if (id === selectedRegion) {
+        if (region.dataset.selected === "true") {
           region.style.stroke = "#DC2626";
           region.style.strokeWidth = "5";
 
@@ -220,20 +176,14 @@ export const Map = () => {
 
         region.style.stroke = "#1C3458";
         region.style.strokeWidth = "3";
-
         region.style.transform = "scale(1.015)";
 
         region.style.filter =
           "drop-shadow(0px 5px 8px rgba(28, 52, 88, 0.25))";
-
-        region.style.opacity = "1";
       };
 
-
-
       const handleMouseLeave = () => {
- 
-        if (id === selectedRegion) {
+        if (region.dataset.selected === "true") {
           region.style.fill = data.color;
           region.style.stroke = "#EF4444";
           region.style.strokeWidth = "4";
@@ -257,56 +207,82 @@ export const Map = () => {
         setSelectedRegion(id);
       };
 
-      region.addEventListener(
-        "mouseenter",
-        handleMouseEnter
-      );
+      region.addEventListener("mouseenter", handleMouseEnter);
+      region.addEventListener("mouseleave", handleMouseLeave);
+      region.addEventListener("click", handleClick);
 
-      region.addEventListener(
-        "mouseleave",
-        handleMouseLeave
-      );
-
-      region.addEventListener(
-        "click",
-        handleClick
-      );
-
-      region._mapHandlers = {
+      regionsRef.current.push({
+        region,
         handleMouseEnter,
         handleMouseLeave,
         handleClick,
-      };
+      });
     });
 
     return () => {
-      regions.forEach((region) => {
-        if (!region._mapHandlers) return;
+      regionsRef.current.forEach(
+        ({
+          region,
+          handleMouseEnter,
+          handleMouseLeave,
+          handleClick,
+        }) => {
+          region.removeEventListener(
+            "mouseenter",
+            handleMouseEnter
+          );
 
-        region.removeEventListener(
-          "mouseenter",
-          region._mapHandlers.handleMouseEnter
-        );
+          region.removeEventListener(
+            "mouseleave",
+            handleMouseLeave
+          );
 
-        region.removeEventListener(
-          "mouseleave",
-          region._mapHandlers.handleMouseLeave
-        );
+          region.removeEventListener(
+            "click",
+            handleClick
+          );
+        }
+      );
 
-        region.removeEventListener(
-          "click",
-          region._mapHandlers.handleClick
-        );
-
-        delete region._mapHandlers;
-      });
-
-      svg
-        .querySelectorAll("[data-region-label]")
-        .forEach((label) => {
-          label.remove();
-        });
+      regionsRef.current = [];
+      container.innerHTML = "";
     };
+  }, []);
+
+  useEffect(() => {
+    regionsRef.current.forEach(({ region }) => {
+      const id = region.getAttribute("id");
+      const data = regionData[id];
+
+      if (!data) return;
+
+      region.dataset.selected = "false";
+      region.style.fill = data.color;
+      region.style.stroke = "#ffffff";
+      region.style.strokeWidth = "1";
+      region.style.transform = "scale(1)";
+      region.style.filter = "none";
+    });
+
+    if (!selectedRegion) return;
+
+    const selected = regionsRef.current.find(
+      ({ region }) =>
+        region.getAttribute("id") === selectedRegion
+    );
+
+    if (!selected) return;
+
+    const region = selected.region;
+    const data = regionData[selectedRegion];
+
+    region.dataset.selected = "true";
+    region.style.fill = data.color;
+    region.style.stroke = "#EF4444";
+    region.style.strokeWidth = "4";
+
+    region.style.filter =
+      "drop-shadow(0px 4px 7px rgba(239, 68, 68, 0.35))";
   }, [selectedRegion]);
 
   const selectedData = selectedRegion
@@ -315,24 +291,19 @@ export const Map = () => {
 
   return (
     <div className="w-full">
-
       <div className="mb-6">
-
         <h1 className="text-2xl font-bold text-[#1C3458]">
-          Карта Кыргызстана
+          Кыргызстандын картасы
         </h1>
 
         <p className="mt-1 text-gray-500">
-          Выберите регион, чтобы посмотреть информацию
+          Маалыматты көрүү үчүн аймакты тандаңыз
         </p>
-
       </div>
 
-
       <div className="flex items-start gap-6">
-
+        {/* КАРТА */}
         <div className="w-2/3 rounded-2xl bg-white p-6 shadow-sm">
-
           <div
             ref={mapRef}
             className="
@@ -342,110 +313,78 @@ export const Map = () => {
               [&_path]:transition-all
               [&_path]:duration-200
             "
-            dangerouslySetInnerHTML={{
-              __html: mapSvg,
-            }}
           />
-
         </div>
 
         <div className="w-1/3">
-
           {selectedData ? (
-
             <div className="rounded-2xl bg-white p-6 shadow-sm">
-
               <div className="mb-6 flex items-center gap-3">
-
                 <div
                   className="h-4 w-4 shrink-0 rounded-full"
                   style={{
-                    backgroundColor:
-                      selectedData.color,
+                    backgroundColor: selectedData.color,
                   }}
                 />
 
                 <h2 className="text-xl font-bold text-[#1C3458]">
                   {selectedData.name}
                 </h2>
-
               </div>
 
               <div className="space-y-4">
-
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-
                   <span className="text-gray-500">
-                    Библиотек
+                    Китепканалар
                   </span>
 
                   <span className="font-semibold text-[#1C3458]">
                     {selectedData.libraries}
                   </span>
-
                 </div>
 
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-
                   <span className="text-gray-500">
-                    Пользователей
+                    Колдонуучулар
                   </span>
 
                   <span className="font-semibold text-[#1C3458]">
-                    {selectedData.users.toLocaleString(
-                      "ru-RU"
-                    )}
+                    {selectedData.users.toLocaleString("ru-RU")}
                   </span>
-
                 </div>
 
                 <div className="flex items-center justify-between">
-
                   <span className="text-gray-500">
-                    Книг
+                    Китептер
                   </span>
 
                   <span className="font-semibold text-[#1C3458]">
-                    {selectedData.books.toLocaleString(
-                      "ru-RU"
-                    )}
+                    {selectedData.books.toLocaleString("ru-RU")}
                   </span>
-
                 </div>
-
               </div>
-
             </div>
-
           ) : (
-
             <div className="rounded-2xl bg-white p-6 shadow-sm">
-
               <div className="py-8 text-center">
-
                 <div className="mb-4 text-4xl">
                   🗺️
                 </div>
 
                 <h2 className="text-lg font-semibold text-[#1C3458]">
-                  Выберите регион
+                  Аймакты тандаңыз
                 </h2>
 
                 <p className="mt-2 text-sm text-gray-500">
-                  Нажмите на область на карте,
-                  чтобы увидеть статистику
+                  Статистиканы көрүү үчүн
+                  <br />
+                  картадан аймакты басыңыз
                 </p>
-
               </div>
-
             </div>
-
           )}
-
         </div>
-
       </div>
-
     </div>
   );
 };

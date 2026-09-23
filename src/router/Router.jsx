@@ -2,13 +2,14 @@ import { Routes, Route } from "react-router-dom";
 
 import { HomePage } from "../pages/HomePage";
 import { LibrariesPage } from "../pages/LibrariesPage";
+import { RegionDetailPage } from "../pages/RegionDetailPage";
 import LibrarySection from "../pages/Library/LibrarySection";
 import { Profile } from "../pages/Profile";
 import AnotherPage from "../pages/AnotherPage/AnotherPage";
-
 import PageTransition from "../components/PageTransition";
 import { Map } from "../pages/Map/Map";
 import ReportPage from "../pages/Report/ReportPage";
+import { ReportsPage } from "../pages/ReportsPage";
 
 export const Router = ({ user }) => {
   return (
@@ -27,6 +28,16 @@ export const Router = ({ user }) => {
         element={
           <PageTransition>
             <LibrariesPage />
+          </PageTransition>
+        }
+      />
+
+      {/* Регион */}
+      <Route
+        path="/libraries/:regionId"
+        element={
+          <PageTransition>
+            <RegionDetailPage />
           </PageTransition>
         }
       />
@@ -62,7 +73,7 @@ export const Router = ({ user }) => {
         path="/map"
         element={
           <PageTransition>
-            <Map/>
+            <Map />
           </PageTransition>
         }
       />
@@ -71,7 +82,16 @@ export const Router = ({ user }) => {
         path="/rep"
         element={
           <PageTransition>
-            <ReportPage/>
+            <ReportPage />
+          </PageTransition>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <PageTransition>
+            <ReportsPage />
           </PageTransition>
         }
       />

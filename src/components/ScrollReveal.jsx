@@ -4,22 +4,28 @@ const ScrollReveal = ({ children }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const elements = containerRef.current.querySelectorAll(
-      "[data-scroll-reveal]"
-    );
+    const container = containerRef.current;
+
+    if (!container) return;
+
+    const elements = container.querySelectorAll("[data-scroll-reveal]");
+
+    if (!elements.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("scroll-reveal-visible");
+            entry.target.classList.remove("scroll-reveal-hidden");
 
             observer.unobserve(entry.target);
           }
         });
       },
       {
-        threshold: 0.15,
+        threshold: 0.1,
+        rootMargin: "0px 0px -30px 0px",
       }
     );
 

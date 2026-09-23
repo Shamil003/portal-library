@@ -1,149 +1,120 @@
 import { useState } from "react";
-import { Library } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AnimatedSearch from "../components/AnimatedSearch";
+import uploadIcon from "../assets/images/Upload.svg";
 
-export const RegionDetailPage = () => {
+export const ReportsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const region = location.state?.region;
+  const library = location.state?.library;
 
   const [search, setSearch] = useState("");
 
-  const librariesList = [
+  const reportsList = [
     {
       id: 1,
-      name: "Баланчаев Баланча а. китепкана",
-      status: "отчет даяр эмес",
-      badge: "4 / 5",
-      isReady: false,
-      completedCards: [1, 2, 3, 4],
-      totalCards: 5,
+      date: "01/09/2021",
+      status: "Отчет даяр",
+      badge: "7 / 7",
+      isReady: true,
+      completedCards: [1, 2, 3, 4, 5, 6, 7],
     },
     {
       id: 2,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
-      badge: "1 / 1",
-      isReady: true,
-      completedCards: [1],
-      totalCards: 1,
+      date: "15/08/2021",
+      status: "Отчет даяр эмес",
+      badge: "5 / 7",
+      isReady: false,
+      completedCards: [1, 2, 3, 5, 7],
     },
     {
       id: 3,
-      name: "Китепкананын аты",
-      status: "отчет даяр эмес",
-      badge: "1 / 3",
-      isReady: false,
-      completedCards: [2],
-      totalCards: 3,
+      date: "01/07/2021",
+      status: "Отчет даяр",
+      badge: "7 / 7",
+      isReady: true,
+      completedCards: [1, 2, 3, 4, 5, 6, 7],
     },
     {
       id: 4,
-      name: "Китепкананын аты",
-      status: "отчет даяр эмес",
-      badge: "1 / 4",
+      date: "15/06/2021",
+      status: "Отчет даяр эмес",
+      badge: "3 / 7",
       isReady: false,
-      completedCards: [1],
-      totalCards: 4,
+      completedCards: [1, 4, 6],
     },
     {
       id: 5,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
+      date: "01/05/2021",
+      status: "Отчет даяр",
       badge: "7 / 7",
       isReady: true,
       completedCards: [1, 2, 3, 4, 5, 6, 7],
-      totalCards: 7,
     },
     {
       id: 6,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
+      date: "01/04/2021",
+      status: "Отчет даяр",
       badge: "7 / 7",
       isReady: true,
       completedCards: [1, 2, 3, 4, 5, 6, 7],
-      totalCards: 7,
     },
     {
       id: 7,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
-      badge: "6 / 6",
-      isReady: true,
-      completedCards: [1, 2, 3, 4, 5, 6],
-      totalCards: 6,
+      date: "01/03/2021",
+      status: "Отчет даяр эмес",
+      badge: "2 / 7",
+      isReady: false,
+      completedCards: [2, 5],
     },
     {
       id: 8,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
-      badge: "2 / 2",
+      date: "01/02/2021",
+      status: "Отчет даяр",
+      badge: "7 / 7",
       isReady: true,
-      completedCards: [1, 2],
-      totalCards: 2,
-    },
-    {
-      id: 9,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
-      badge: "9 / 9",
-      isReady: true,
-      completedCards: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-      totalCards: 9,
-    },
-    {
-      id: 10,
-      name: "Китепкананын аты",
-      status: "отчет даяр эмес",
-      badge: "3 / 9",
-      isReady: false,
-      completedCards: [1, 4, 7],
-      totalCards: 9,
-    },
-    {
-      id: 11,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
-      badge: "3 / 3",
-      isReady: true,
-      completedCards: [1, 2, 3],
-      totalCards: 3,
-    },
-    {
-      id: 12,
-      name: "Китепкананын аты",
-      status: "отчет даяр",
-      badge: "5 / 5",
-      isReady: true,
-      completedCards: [1, 2, 3, 4, 5],
-      totalCards: 5,
+      completedCards: [1, 2, 3, 4, 5, 6, 7],
     },
   ];
 
-  const filteredLibraries = librariesList.filter((lib) =>
-    lib.name.toLowerCase().includes(search.toLowerCase())
+  const filteredReports = reportsList.filter((report) =>
+    report.date.includes(search)
   );
 
-  const handleLibraryClick = (library) => {
-    navigate("/another", {
+  const readyReports = reportsList.filter(
+    (report) => report.isReady
+  ).length;
+
+  const notReadyReports = reportsList.filter(
+    (report) => !report.isReady
+  ).length;
+
+  const handleBack = () => {
+    navigate(`/libraries/${region?.id || "osh"}`, {
       state: {
         region,
-        library,
       },
     });
   };
 
-  const handleBack = () => {
-    navigate("/libraries");
+  const handleReportClick = (report) => {
+    navigate("/library", {
+      state: {
+        region,
+        library,
+        report,
+      },
+    });
   };
 
   return (
     <div>
       <div className="mb-6 flex items-center gap-2 text-sm font-medium text-gray-500">
         <span
-          onClick={handleBack}
+          onClick={() => navigate("/libraries")}
           className="cursor-pointer transition hover:text-blue-600"
         >
           Китепканалар
@@ -151,15 +122,30 @@ export const RegionDetailPage = () => {
 
         <span className="text-gray-400">/</span>
 
-        <span className="font-bold text-slate-800">
+        <span
+          onClick={handleBack}
+          className="cursor-pointer transition hover:text-blue-600"
+        >
           {region?.name || "Ош облусу"}
+        </span>
+
+        <span className="text-gray-400">/</span>
+
+        <span className="font-bold text-slate-800">
+          {library?.name || "Китепкананын аты"}
+        </span>
+
+        <span className="text-gray-400">/</span>
+
+        <span className="font-bold text-slate-800">
+          Отчеттор
         </span>
       </div>
 
       <div className="mb-6 grid grid-cols-5 gap-4">
         <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
-            <Library size={20} />
+            <Upload size={20} />
           </div>
 
           <p className="text-[10px] font-semibold uppercase text-gray-500">
@@ -167,13 +153,37 @@ export const RegionDetailPage = () => {
           </p>
 
           <div className="mt-1 text-2xl font-bold">
-            {region?.count || "1,789"}
+            {reportsList.length}
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm" />
+        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+            <Upload size={20} />
+          </div>
 
-        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm" />
+          <p className="text-[10px] font-semibold uppercase text-gray-500">
+            Даяр отчеттор
+          </p>
+
+          <div className="mt-1 text-2xl font-bold">
+            {readyReports}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+            <Upload size={20} />
+          </div>
+
+          <p className="text-[10px] font-semibold uppercase text-gray-500">
+            Даяр эмес отчеттор
+          </p>
+
+          <div className="mt-1 text-2xl font-bold">
+            {notReadyReports}
+          </div>
+        </div>
 
         <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm" />
 
@@ -186,10 +196,10 @@ export const RegionDetailPage = () => {
       />
 
       <div className="mt-6 space-y-3">
-        {filteredLibraries.map((lib) => (
+        {filteredReports.map((report) => (
           <div
-            key={lib.id}
-            onClick={() => handleLibraryClick(lib)}
+            key={report.id}
+            onClick={() => handleReportClick(report)}
             className="
               group
               flex
@@ -211,7 +221,7 @@ export const RegionDetailPage = () => {
           >
             <div className="min-w-[180px]">
               <p className="text-sm font-semibold text-slate-800">
-                {lib.name}
+                {report.date}
               </p>
             </div>
 
@@ -221,14 +231,20 @@ export const RegionDetailPage = () => {
                   text-xs
                   font-semibold
                   ${
-                    lib.isReady
+                    report.isReady
                       ? "text-emerald-600"
                       : "text-slate-600"
                   }
                 `}
               >
-                {lib.status}
+                {report.status}
               </span>
+
+              <img
+                src={uploadIcon}
+                alt="Жүктөө"
+                className="h-5 w-5"
+              />
 
               <span
                 className={`
@@ -241,22 +257,22 @@ export const RegionDetailPage = () => {
                   text-xs
                   font-semibold
                   ${
-                    lib.isReady
+                    report.isReady
                       ? "border-emerald-100 bg-emerald-50 text-emerald-600"
                       : "border-slate-200 bg-slate-50 text-slate-600"
                   }
                 `}
               >
-                {lib.badge}
+                {report.badge}
               </span>
             </div>
           </div>
         ))}
 
-        {filteredLibraries.length === 0 && (
+        {filteredReports.length === 0 && (
           <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center">
             <p className="text-sm font-medium text-gray-500">
-              Китепканалар табылган жок
+              Отчеттор табылган жок
             </p>
           </div>
         )}
