@@ -57,7 +57,7 @@ export const Modal = ({ setUser }) => {
   hover:scale-105
   active:scale-95"
       >
-        Войти
+        Кирүү
       </button>
 
       {isOpen && (
@@ -92,7 +92,7 @@ export const Modal = ({ setUser }) => {
                   setEmail(e.target.value);
                   setError("");
                 }}
-                placeholder="Почта"
+                placeholder="Email"
                 className="w-full h-[40px] bg-transparent border-b-2 border-white outline-none text-white placeholder:text-white placeholder:opacity-90"
               />
 
@@ -107,12 +107,6 @@ export const Modal = ({ setUser }) => {
                   placeholder="Сыр сөз"
                   className="w-full h-[40px] bg-transparent border-b-2 border-white outline-none text-white placeholder:text-white placeholder:opacity-90"
                 />
-
-                <div className="mt-[8px] text-right">
-                  <button className="text-[11px] underline cursor-pointer">
-                    Сыр сөздү унуттуңузбу?
-                  </button>
-                </div>
               </div>
 
 
@@ -128,10 +122,6 @@ export const Modal = ({ setUser }) => {
               >
                 Кирүү
               </button>
-
-              <p className="cursor-pointer text-center text-[11px] -mt-[12px]">
-                Аккаунтуңуз жокпу?
-              </p>
             </div>
 
             <button

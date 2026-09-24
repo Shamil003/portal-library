@@ -36,7 +36,7 @@ export const Header = ({ user, setUser, onLogout }) => {
   hover:scale-105
   active:scale-95"
           >
-            Выйти
+            Чыгуу
           </button>
         </div>
       ) : (
