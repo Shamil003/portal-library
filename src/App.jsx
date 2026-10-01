@@ -9,16 +9,18 @@ const tabToPath = {
   home: "/",
   libraries: "/libraries",
   profile: "/profile",
-  map: "Map",
-  rep: 'Rep'
+  map: "/map",
+  rep: "/rep",
+  reports: "/reports",
 };
 
 const pathToTab = {
   "/": "home",
   "/libraries": "libraries",
   "/profile": "profile",
-  "/map": "Map",
-  "/rep": "rep"
+  "/map": "map",
+  "/rep": "rep",
+  "/reports": "reports",
 };
 
 const App = () => {
@@ -46,15 +48,12 @@ const App = () => {
 
   const handleLogin = (userData) => {
     setUser(userData);
-
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setUser(null);
-
     localStorage.removeItem("user");
-
     navigate("/");
   };
 

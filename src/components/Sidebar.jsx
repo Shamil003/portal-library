@@ -22,7 +22,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
       icon: FileText,
     },
     {
-      id: "yearly",
+      id: "reports",
       label: "Жылдык отчёттор",
       icon: FileText,
     },
@@ -96,7 +96,6 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
               `}
             >
               <Icon size={20} />
-
               <span>{item.label}</span>
             </button>
           );

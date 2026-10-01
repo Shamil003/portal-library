@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Users,
@@ -15,7 +16,11 @@ import {
   BarChart3,
 } from "lucide-react";
 
+const STORAGE_KEY = "libraryReports";
+
 const ReportPage = () => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     totalUsers: "",
     men: "",
@@ -42,8 +47,46 @@ const ReportPage = () => {
   const [sent, setSent] = useState(false);
 
   const inputRefs = useRef({});
-
   const [errors, setErrors] = useState({});
+
+  /*
+   * Если открыли отчёт на редактирование,
+   * загружаем его данные в форму.
+   */
+  React.useEffect(() => {
+    const editingReport = localStorage.getItem("editingReport");
+
+    if (!editingReport) {
+      return;
+    }
+
+    try {
+      const report = JSON.parse(editingReport);
+
+      setForm({
+        totalUsers: String(report.totalUsers ?? ""),
+        men: String(report.men ?? ""),
+        women: String(report.women ?? ""),
+        childrenUnder15: String(report.childrenUnder15 ?? ""),
+        youth: String(report.youth ?? ""),
+
+        totalVisits: String(report.totalVisits ?? ""),
+        virtualVisits: String(report.virtualVisits ?? ""),
+        visitMen: String(report.visitMen ?? ""),
+        visitWomen: String(report.visitWomen ?? ""),
+        visitChildren: String(report.visitChildren ?? ""),
+        visitYouth: String(report.visitYouth ?? ""),
+
+        events: String(report.events ?? ""),
+        eventMen: String(report.eventMen ?? ""),
+        eventWomen: String(report.eventWomen ?? ""),
+        eventChildren: String(report.eventChildren ?? ""),
+        eventYouth: String(report.eventYouth ?? ""),
+      });
+    } catch (error) {
+      console.error("Ошибка загрузки отчёта:", error);
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,14 +106,19 @@ const ReportPage = () => {
     if (value.trim() !== "") {
       setErrors((prev) => {
         const newErrors = { ...prev };
+
         delete newErrors[name];
+
         return newErrors;
       });
     }
   };
 
   const handleSave = () => {
-    localStorage.setItem("libraryReport", JSON.stringify(form));
+    localStorage.setItem(
+      "libraryReportDraft",
+      JSON.stringify(form)
+    );
 
     setSaved(true);
 
@@ -122,7 +170,33 @@ const ReportPage = () => {
     setSent(false);
 
     try {
+      const editingReport = localStorage.getItem(
+        "editingReport"
+      );
+
+      const oldReport = editingReport
+        ? JSON.parse(editingReport)
+        : null;
+
       const report = {
+        id: oldReport?.id || Date.now(),
+
+        library:
+          oldReport?.library ||
+          "Баланчаева а. китепкана",
+
+        region:
+          oldReport?.region ||
+          "Ош облусу",
+
+        period:
+          oldReport?.period ||
+          "Сентябрь 2026",
+
+        date: new Date().toLocaleDateString("ru-RU"),
+
+        status: "На проверке",
+
         totalUsers: Number(form.totalUsers),
         men: Number(form.men),
         women: Number(form.women),
@@ -143,15 +217,58 @@ const ReportPage = () => {
         eventYouth: Number(form.eventYouth),
       };
 
-      console.log("Маалыматтар:", report);
+      const savedReports =
+        localStorage.getItem(STORAGE_KEY);
+
+      const reports = savedReports
+        ? JSON.parse(savedReports)
+        : [];
+
+      if (oldReport) {
+        /*
+         * Обновляем существующий отчёт.
+         */
+        const updatedReports = reports.map((item) =>
+          item.id === oldReport.id
+            ? report
+            : item
+        );
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(updatedReports)
+        );
+
+        localStorage.removeItem("editingReport");
+      } else {
+        /*
+         * Создаём новый отчёт.
+         */
+        reports.push(report);
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(reports)
+        );
+      }
+
+      console.log("Отчёт отправлен:", report);
 
       await new Promise((resolve) =>
         setTimeout(resolve, 1000)
       );
 
       setSent(true);
+
+      /*
+       * Через секунду открываем страницу
+       * со всеми отчётами.
+       */
+      setTimeout(() => {
+        navigate("/reports");
+      }, 1000);
     } catch (error) {
-      console.error("Ката:", error);
+      console.error("Ошибка отправки:", error);
     } finally {
       setLoading(false);
     }
@@ -161,21 +278,9 @@ const ReportPage = () => {
     <div className="min-h-full bg-[#F3F5F9] px-6 py-6">
       <div className="mx-auto max-w-[1100px]">
 
-        {/* <div className="mb-5 flex flex-wrap items-center gap-2 text-[13px] text-[#8992A3]">
-          <span>Китепканалар</span>
-          <span>/</span>
-          <span>Ош облусу</span>
-          <span>/</span>
-          <span>Баланчаева а. китепкана</span>
-          <span>/</span>
-
-          <span className="font-medium text-[#1C3458]">
-            Отчет
-          </span>
-        </div> */}
-
         {/* Header */}
         <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.06)] md:flex-row md:items-center md:justify-between">
+
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF1FA]">
               <BarChart3
@@ -213,6 +318,7 @@ const ReportPage = () => {
           </div>
         </div>
 
+        {/* Library */}
         <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EAF1FA]">
@@ -235,6 +341,8 @@ const ReportPage = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
+
+          {/* Users */}
           <ReportSection
             icon={<Users size={20} />}
             title="Колдонуучулар"
@@ -291,6 +399,7 @@ const ReportPage = () => {
             />
           </ReportSection>
 
+          {/* Visits */}
           <ReportSection
             icon={<BookOpen size={20} />}
             title="Келүүлөр"
@@ -357,6 +466,7 @@ const ReportPage = () => {
             />
           </ReportSection>
 
+          {/* Events */}
           <ReportSection
             icon={<CalendarDays size={20} />}
             title="Иш-чаралар"
@@ -413,6 +523,7 @@ const ReportPage = () => {
             />
           </ReportSection>
 
+          {/* Warning */}
           <div className="mb-5 rounded-2xl border border-[#E5E9EF] bg-white p-5">
             <div className="flex gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#FFF7E6]">
@@ -436,6 +547,7 @@ const ReportPage = () => {
             </div>
           </div>
 
+          {/* Success */}
           {sent && (
             <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#B9E5CC] bg-[#F0FBF4] p-4">
               <CheckCircle2
@@ -455,7 +567,9 @@ const ReportPage = () => {
             </div>
           )}
 
+          {/* Buttons */}
           <div className="mb-10 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
             <button
               type="button"
               onClick={handleSave}
@@ -498,6 +612,10 @@ const ReportPage = () => {
   );
 };
 
+/* =========================
+   Report Section
+========================= */
+
 const ReportSection = ({
   icon,
   title,
@@ -528,6 +646,10 @@ const ReportSection = ({
     </section>
   );
 };
+
+/* =========================
+   Report Input
+========================= */
 
 const ReportInput = ({
   icon,

@@ -91,9 +91,6 @@ export const Map = () => {
 
   const [selectedRegion, setSelectedRegion] = useState(null);
 
-  // ============================
-  // ZOOM
-  // ============================
 
   const zoomRef = useRef(1);
 
@@ -101,9 +98,6 @@ export const Map = () => {
   const MAX_ZOOM = 2.5;
   const ZOOM_STEP = 0.15;
 
-  // ============================
-  // ПЕРЕМЕЩЕНИЕ КАРТЫ
-  // ============================
 
   const positionRef = useRef({
     x: 0,
@@ -119,9 +113,6 @@ export const Map = () => {
     hasMoved: false,
   });
 
-  // ============================
-  // ZOOM + DRAG
-  // ============================
 
   useEffect(() => {
     const wrapper = mapWrapperRef.current;
@@ -139,21 +130,15 @@ export const Map = () => {
       `;
     };
 
-    // ============================
-    // КОЛЕСО МЫШИ
-    // ============================
-
     const handleWheel = (event) => {
       event.preventDefault();
 
       if (event.deltaY < 0) {
-        // Вверх — увеличить
         zoomRef.current = Math.min(
           zoomRef.current + ZOOM_STEP,
           MAX_ZOOM
         );
       } else {
-        // Вниз — уменьшить
         zoomRef.current = Math.max(
           zoomRef.current - ZOOM_STEP,
           MIN_ZOOM
@@ -163,12 +148,8 @@ export const Map = () => {
       updateMapTransform();
     };
 
-    // ============================
-    // НАЖАТИЕ МЫШИ
-    // ============================
 
     const handleMouseDown = (event) => {
-      // Только левая кнопка
       if (event.button !== 0) return;
 
       dragRef.current.isDragging = true;
@@ -188,9 +169,6 @@ export const Map = () => {
       event.preventDefault();
     };
 
-    // ============================
-    // ДВИЖЕНИЕ
-    // ============================
 
     const handleMouseMove = (event) => {
       if (!dragRef.current.isDragging) return;
@@ -203,7 +181,6 @@ export const Map = () => {
         event.clientY -
         dragRef.current.startY;
 
-      // Если мышь реально двинулась
       if (
         Math.abs(deltaX) > 4 ||
         Math.abs(deltaY) > 4
@@ -220,9 +197,6 @@ export const Map = () => {
       updateMapTransform();
     };
 
-    // ============================
-    // ОТПУСКАНИЕ МЫШИ
-    // ============================
 
     const handleMouseUp = () => {
       if (!dragRef.current.isDragging) return;
@@ -231,10 +205,6 @@ export const Map = () => {
 
       wrapper.style.cursor = "grab";
     };
-
-    // ============================
-    // ПОДКЛЮЧАЕМ СОБЫТИЯ
-    // ============================
 
     wrapper.addEventListener(
       "wheel",
@@ -282,9 +252,6 @@ export const Map = () => {
     };
   }, []);
 
-  // ============================
-  // СОЗДАНИЕ SVG КАРТЫ
-  // ============================
 
   useEffect(() => {
     const container = mapRef.current;
@@ -299,9 +266,6 @@ export const Map = () => {
 
     regionsRef.current = [];
 
-    // ============================
-    // НАЗВАНИЯ РЕГИОНОВ
-    // ============================
 
     Object.entries(regionData).forEach(
       ([id, data]) => {
@@ -345,7 +309,6 @@ export const Map = () => {
           id === "KGGB" ||
           id === "KGGO";
 
-        // Города крупнее
         text.style.fontSize = isCity
           ? "18px"
           : "13px";
@@ -359,7 +322,6 @@ export const Map = () => {
         text.style.pointerEvents = "none";
         text.style.userSelect = "none";
 
-        // Белая обводка текста
         text.style.paintOrder = "stroke";
         text.style.stroke = "#ffffff";
 
@@ -375,10 +337,6 @@ export const Map = () => {
       }
     );
 
-    // ============================
-    // РЕГИОНЫ
-    // ============================
-
     const regions =
       svg.querySelectorAll("path");
 
@@ -393,10 +351,6 @@ export const Map = () => {
       const isCity =
         id === "KGGB" ||
         id === "KGGO";
-
-      // ============================
-      // ОСНОВНОЙ СТИЛЬ
-      // ============================
 
       region.style.fill = data.color;
 
@@ -425,15 +379,10 @@ export const Map = () => {
       region.style.transformOrigin =
         "center";
 
-      // Бишкек и Ош немного больше
       if (isCity) {
         region.style.transform =
           "scale(1.08)";
       }
-
-      // ============================
-      // НАВЕДЕНИЕ
-      // ============================
 
       const handleMouseEnter = () => {
         if (dragRef.current.hasMoved) return;
@@ -471,10 +420,6 @@ export const Map = () => {
         region.style.filter =
           "drop-shadow(0px 5px 8px rgba(28, 52, 88, 0.25))";
       };
-
-      // ============================
-      // УБРАЛИ МЫШЬ
-      // ============================
 
       const handleMouseLeave = () => {
         if (
@@ -520,18 +465,12 @@ export const Map = () => {
         region.style.opacity = "1";
       };
 
-      // ============================
-      // КЛИК
-      // ============================
 
       const handleClick = (event) => {
-        // Если карту двигали —
-        // не выбираем регион
         if (dragRef.current.hasMoved) {
           event.preventDefault();
           event.stopPropagation();
 
-          // Сбрасываем после drag
           setTimeout(() => {
             dragRef.current.hasMoved =
               false;
@@ -543,9 +482,6 @@ export const Map = () => {
         setSelectedRegion(id);
       };
 
-      // ============================
-      // СОБЫТИЯ
-      // ============================
 
       region.addEventListener(
         "mouseenter",
@@ -570,9 +506,6 @@ export const Map = () => {
       });
     });
 
-    // ============================
-    // CLEANUP
-    // ============================
 
     return () => {
       regionsRef.current.forEach(
@@ -605,9 +538,6 @@ export const Map = () => {
     };
   }, []);
 
-  // ============================
-  // ВЫБОР РЕГИОНА
-  // ============================
 
   useEffect(() => {
     regionsRef.current.forEach(
@@ -690,16 +620,10 @@ export const Map = () => {
     ? regionData[selectedRegion]
     : null;
 
-  // ============================
-  // RENDER
-  // ============================
 
   return (
     <div className="w-full">
 
-      {/* ============================
-          ЗАГОЛОВОК
-      ============================ */}
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#1C3458]">
@@ -712,15 +636,9 @@ export const Map = () => {
         </p>
       </div>
 
-      {/* ============================
-          КАРТА + ИНФОРМАЦИЯ
-      ============================ */}
 
       <div className="flex items-start gap-6">
 
-        {/* ============================
-            КАРТА
-        ============================ */}
 
         <div className="w-2/3 rounded-2xl bg-white p-6 shadow-sm">
 
@@ -758,10 +676,6 @@ export const Map = () => {
               }}
             />
 
-            {/* ============================
-                ПОДСКАЗКА
-            ============================ */}
-
             <div
               className="
                 pointer-events-none
@@ -786,10 +700,6 @@ export const Map = () => {
 
           </div>
         </div>
-
-        {/* ============================
-            ИНФОРМАЦИЯ
-        ============================ */}
 
         <div className="w-1/3">
 

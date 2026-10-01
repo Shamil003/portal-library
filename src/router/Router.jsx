@@ -9,11 +9,12 @@ import AnotherPage from "../pages/AnotherPage/AnotherPage";
 import PageTransition from "../components/PageTransition";
 import { Map } from "../pages/Map/Map";
 import ReportPage from "../pages/Report/ReportPage";
-import { ReportsPage } from "../pages/ReportsPage";
+import { Reports } from "../pages/Reports/Reports";
 
 export const Router = ({ user }) => {
   return (
     <Routes>
+      {/* Главная */}
       <Route
         path="/"
         element={
@@ -23,6 +24,7 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Библиотеки */}
       <Route
         path="/libraries"
         element={
@@ -42,6 +44,7 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Библиотека */}
       <Route
         path="/library"
         element={
@@ -51,6 +54,7 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Другая страница */}
       <Route
         path="/another"
         element={
@@ -60,6 +64,7 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Профиль */}
       <Route
         path="/profile"
         element={
@@ -69,6 +74,7 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Карта */}
       <Route
         path="/map"
         element={
@@ -78,6 +84,7 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Заполнение отчёта */}
       <Route
         path="/rep"
         element={
@@ -87,11 +94,12 @@ export const Router = ({ user }) => {
         }
       />
 
+      {/* Все отчёты */}
       <Route
         path="/reports"
         element={
           <PageTransition>
-            <ReportsPage />
+            <Reports />
           </PageTransition>
         }
       />
