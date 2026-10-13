@@ -14,7 +14,6 @@ import { Reports } from "../pages/Reports/Reports";
 export const Router = ({ user }) => {
   return (
     <Routes>
-      {/* Главная */}
       <Route
         path="/"
         element={
@@ -24,7 +23,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Библиотеки */}
       <Route
         path="/libraries"
         element={
@@ -34,7 +32,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Регион */}
       <Route
         path="/libraries/:regionId"
         element={
@@ -44,7 +41,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Библиотека */}
       <Route
         path="/library"
         element={
@@ -54,7 +50,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Другая страница */}
       <Route
         path="/another"
         element={
@@ -64,7 +59,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Профиль */}
       <Route
         path="/profile"
         element={
@@ -74,7 +68,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Карта */}
       <Route
         path="/map"
         element={
@@ -84,7 +77,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Заполнение отчёта */}
       <Route
         path="/rep"
         element={
@@ -94,7 +86,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* Все отчёты */}
       <Route
         path="/reports"
         element={
