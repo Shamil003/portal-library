@@ -5,6 +5,8 @@ import {
   MapPin,
   Settings,
   Library,
+  FileEdit,
+  AlertTriangle,
 } from "lucide-react";
 
 import gerbLogo from "../assets/gerb.svg";
@@ -18,13 +20,18 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
     },
     {
       id: "rep",
-      label: "Айлык отчёттор",
+      label: "Кварталдык отчёттор",
       icon: FileText,
     },
     {
       id: "reports",
       label: "Жылдык отчёттор",
       icon: FileText,
+    },
+    {
+      id: "edit-requests",
+      label: "Редактирлөө сурамдары",
+      icon: FileEdit,
     },
     {
       id: "stats",
@@ -45,6 +52,11 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
       id: "libraries",
       label: "Китепканалар",
       icon: Library,
+    },
+    {
+      id: "deadlines",
+      label: "Мөөнөттөр",
+      icon: AlertTriangle,
     },
   ];
 

@@ -49,10 +49,6 @@ const ReportPage = () => {
   const inputRefs = useRef({});
   const [errors, setErrors] = useState({});
 
-  /*
-   * Если открыли отчёт на редактирование,
-   * загружаем его данные в форму.
-   */
   React.useEffect(() => {
     const editingReport = localStorage.getItem("editingReport");
 
@@ -84,7 +80,7 @@ const ReportPage = () => {
         eventYouth: String(report.eventYouth ?? ""),
       });
     } catch (error) {
-      console.error("Ошибка загрузки отчёта:", error);
+      console.error("Отчётту жүктөөдө ката:", error);
     }
   }, []);
 
@@ -195,7 +191,16 @@ const ReportPage = () => {
 
         date: new Date().toLocaleDateString("ru-RU"),
 
-        status: "На проверке",
+        /*
+         * Отчёт сразу отправляется — статус "Отправлен".
+         */
+        status: "Отправлен",
+
+        /*
+         * Сбрасываем запрос на редактирование,
+         * чтобы цикл можно было повторить.
+         */
+        editRequest: null,
 
         totalUsers: Number(form.totalUsers),
         men: Number(form.men),
@@ -225,9 +230,6 @@ const ReportPage = () => {
         : [];
 
       if (oldReport) {
-        /*
-         * Обновляем существующий отчёт.
-         */
         const updatedReports = reports.map((item) =>
           item.id === oldReport.id
             ? report
@@ -241,9 +243,6 @@ const ReportPage = () => {
 
         localStorage.removeItem("editingReport");
       } else {
-        /*
-         * Создаём новый отчёт.
-         */
         reports.push(report);
 
         localStorage.setItem(
@@ -252,7 +251,7 @@ const ReportPage = () => {
         );
       }
 
-      console.log("Отчёт отправлен:", report);
+      console.log("Отчёт жөнөтүлдү:", report);
 
       await new Promise((resolve) =>
         setTimeout(resolve, 1000)
@@ -260,15 +259,11 @@ const ReportPage = () => {
 
       setSent(true);
 
-      /*
-       * Через секунду открываем страницу
-       * со всеми отчётами.
-       */
       setTimeout(() => {
         navigate("/reports");
       }, 1000);
     } catch (error) {
-      console.error("Ошибка отправки:", error);
+      console.error("Жөнөтүүдө ката:", error);
     } finally {
       setLoading(false);
     }

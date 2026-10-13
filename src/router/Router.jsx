@@ -10,6 +10,9 @@ import PageTransition from "../components/PageTransition";
 import { Map } from "../pages/Map/Map";
 import ReportPage from "../pages/Report/ReportPage";
 import { Reports } from "../pages/Reports/Reports";
+import EditRequests from "../pages/EditRequests/EditRequests";
+import Deadlines from "../pages/Dedlines/Dedlines";
+import Stats from "../pages/Stats/Stats";
 
 export const Router = ({ user }) => {
   return (
@@ -91,6 +94,33 @@ export const Router = ({ user }) => {
         element={
           <PageTransition>
             <Reports />
+          </PageTransition>
+        }
+      />
+
+      <Route
+        path="/edit-requests"
+        element={
+          <PageTransition>
+            <EditRequests />
+          </PageTransition>
+        }
+      />
+
+      <Route
+        path="/deadlines"
+        element={
+          <PageTransition>
+            <Deadlines />
+          </PageTransition>
+        }
+      />
+
+      <Route
+        path="/stats"
+        element={
+          <PageTransition>
+            <Stats />
           </PageTransition>
         }
       />

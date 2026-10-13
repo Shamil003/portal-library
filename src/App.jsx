@@ -13,6 +13,9 @@ const tabToPath = {
   map: "/map",
   rep: "/rep",
   reports: "/reports",
+  "edit-requests": "/edit-requests",
+  deadlines: "/deadlines",
+  stats: "/stats",
 };
 
 const pathToTab = {
@@ -22,6 +25,9 @@ const pathToTab = {
   "/map": "map",
   "/rep": "rep",
   "/reports": "reports",
+  "/edit-requests": "edit-requests",
+  deadlines: "/deadlines",
+  "/stats": "stats",
 };
 
 const App = () => {
