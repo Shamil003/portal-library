@@ -8,7 +8,7 @@ import { Profile } from "../pages/Profile";
 import AnotherPage from "../pages/AnotherPage/AnotherPage";
 import PageTransition from "../components/PageTransition";
 import { Map } from "../pages/Map/Map";
-import ReportPage from "../pages/Report/ReportPage";
+import ReportsTabs from "../pages/Report/ReportsTabs";
 import { Reports } from "../pages/Reports/Reports";
 import EditRequests from "../pages/EditRequests/EditRequests";
 import Deadlines from "../pages/Dedlines/Dedlines";
@@ -84,7 +84,7 @@ export const Router = ({ user }) => {
         path="/rep"
         element={
           <PageTransition>
-            <ReportPage />
+            <ReportsTabs />
           </PageTransition>
         }
       />

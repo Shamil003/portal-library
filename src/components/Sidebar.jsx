@@ -1,6 +1,6 @@
 import {
   Home,
-  FileText,
+  BarChart3,
   BarChart2,
   MapPin,
   Settings,
@@ -20,13 +20,8 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
     },
     {
       id: "rep",
-      label: "Кварталдык отчёттор",
-      icon: FileText,
-    },
-    {
-      id: "reports",
-      label: "Жылдык отчёттор",
-      icon: FileText,
+      label: "Отчеттор",
+      icon: BarChart3,
     },
     {
       id: "edit-requests",

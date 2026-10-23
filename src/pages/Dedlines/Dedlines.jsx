@@ -184,7 +184,7 @@ const Deadlines = () => {
                     </div>
 
                     <div className="lg:min-w-[130px]">
-                      <p className="text-xs text-[#8992A3]">Дедлайн</p>
+                      <p className="text-xs text-[#8992A3]">Срок</p>
                       <p className={`mt-1 text-sm font-medium ${style.text}`}>
                         {formatDeadline(report.deadline)}
                       </p>

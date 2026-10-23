@@ -28,7 +28,6 @@ import {
   deadlineStyles,
 } from "../../utils/deadline";
 
-const STORAGE_KEY = "libraryReports";
 const EDIT_REQUESTS_KEY = "editRequests";
 
 export const Reports = () => {
@@ -39,7 +38,6 @@ export const Reports = () => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [toast, setToast] = useState(null);
 
-  // Тикер для автообновления «сколько осталось»
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -53,13 +51,21 @@ export const Reports = () => {
   };
 
   useEffect(() => {
-    const savedReports = localStorage.getItem(STORAGE_KEY);
-    if (savedReports) setReports(JSON.parse(savedReports));
+    const stat = JSON.parse(localStorage.getItem("libraryReports") || "[]")
+      .map((r) => ({ ...r, type: r.type || "stat" }));
+    const quarter = JSON.parse(localStorage.getItem("quarterlyReports") || "[]")
+      .map((r) => ({ ...r, type: "quarterly" }));
+    setReports([...stat, ...quarter]);
   }, []);
 
   const updateReports = (newReports) => {
     setReports(newReports);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newReports));
+
+    const stat = newReports.filter((r) => r.type !== "quarterly");
+    const quarter = newReports.filter((r) => r.type === "quarterly");
+
+    localStorage.setItem("libraryReports", JSON.stringify(stat));
+    localStorage.setItem("quarterlyReports", JSON.stringify(quarter));
   };
 
   const handleEdit = (report) => {
@@ -70,7 +76,12 @@ export const Reports = () => {
       return;
     }
 
-    localStorage.setItem("editingReport", JSON.stringify(report));
+    if (report.type === "quarterly") {
+      localStorage.setItem("editingQuarterlyReport", JSON.stringify(report));
+    } else {
+      localStorage.setItem("editingReport", JSON.stringify(report));
+    }
+
     setSelectedReport(null);
     navigate("/rep");
   };
@@ -137,7 +148,6 @@ export const Reports = () => {
   return (
     <div className="min-h-full bg-[#F3F5F9] px-6 py-6">
       <div className="mx-auto max-w-[1200px]">
-        {/* Header */}
         <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.06)] md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF1FA]">
@@ -158,7 +168,6 @@ export const Reports = () => {
           </div>
         </div>
 
-        {/* Счётчики */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5">
             <p className="text-sm text-[#8992A3]">Бардык отчёттор</p>
@@ -189,7 +198,6 @@ export const Reports = () => {
           </div>
         </div>
 
-        {/* Список */}
         <div className="rounded-2xl bg-white shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <div className="border-b border-[#E7EBF0] px-6 py-5">
             <h2 className="text-[18px] font-semibold text-[#1C3458]">
@@ -211,7 +219,6 @@ export const Reports = () => {
                     key={report.id}
                     className={`flex flex-col gap-4 px-6 py-5 transition lg:flex-row lg:items-center lg:justify-between ${style.bg} ${style.hover}`}
                   >
-                    {/* Библиотека */}
                     <div className="flex items-center gap-4">
                       <div
                         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
@@ -231,13 +238,23 @@ export const Reports = () => {
                         <p className="font-medium text-[#1C3458]">
                           {report.library}
                         </p>
+                        <span
+                          className={`mt-1 inline-block rounded-md px-2 py-0.5 text-[11px] font-medium ${
+                            report.type === "quarterly"
+                              ? "bg-[#FFF7E6] text-[#B87500]"
+                              : "bg-[#EAF1FA] text-[#1C3458]"
+                          }`}
+                        >
+                          {report.type === "quarterly"
+                            ? "Кварталдык"
+                            : "Статистикалык"}
+                        </span>
                         <p className="mt-1 text-sm text-[#8992A3]">
                           {report.region}
                         </p>
                       </div>
                     </div>
 
-                    {/* Период */}
                     <div className="lg:min-w-[150px]">
                       <p className="text-xs text-[#8992A3]">Отчёттук мезгил</p>
                       <p className="mt-1 text-sm font-medium text-[#1C3458]">
@@ -245,7 +262,6 @@ export const Reports = () => {
                       </p>
                     </div>
 
-                    {/* Дата отправки */}
                     <div className="lg:min-w-[120px]">
                       <p className="text-xs text-[#8992A3]">Жөнөтүлдү</p>
                       <p className="mt-1 text-sm font-medium text-[#1C3458]">
@@ -253,7 +269,6 @@ export const Reports = () => {
                       </p>
                     </div>
 
-                    {/* Дедлайн */}
                     <div
                       className={`lg:min-w-[180px] rounded-xl border px-3 py-2 ${style.bg} ${style.border}`}
                     >
@@ -273,7 +288,6 @@ export const Reports = () => {
                       </div>
                     </div>
 
-                    {/* Статус */}
                     <div>
                       {report.status === "Отправлен" && (
                         <div className="flex items-center gap-2 rounded-lg bg-[#EAF1FA] px-3 py-2 text-xs font-medium text-[#1C3458]">
@@ -289,7 +303,6 @@ export const Reports = () => {
                       )}
                     </div>
 
-                    {/* Кнопка */}
                     <button
                       type="button"
                       onClick={() => setSelectedReport(report)}
@@ -329,10 +342,6 @@ export const Reports = () => {
   );
 };
 
-/* =========================
-   Модалка
-========================= */
-
 const ReportModal = ({ report, onClose, onEdit, onRequestEdit }) => {
   const dl = getDeadlineStatus(report.deadline);
   const style = deadlineStyles[dl.status];
@@ -342,7 +351,11 @@ const ReportModal = ({ report, onClose, onEdit, onRequestEdit }) => {
       <div className="max-h-[90vh] w-full max-w-[900px] overflow-hidden rounded-2xl bg-[#F3F5F9] shadow-2xl">
         <div className="flex items-center justify-between bg-[#1C3458] px-6 py-5 text-white">
           <div>
-            <h2 className="text-xl font-semibold">Китепкананын отчёту</h2>
+            <h2 className="text-xl font-semibold">
+              {report.type === "quarterly"
+                ? "Кварталдык отчёт"
+                : "Китепкананын отчёту"}
+            </h2>
             <p className="mt-1 text-sm text-white/70">
               {report.library} · {report.region}
             </p>
@@ -357,7 +370,6 @@ const ReportModal = ({ report, onClose, onEdit, onRequestEdit }) => {
         </div>
 
         <div className="max-h-[65vh] overflow-y-auto p-6">
-          {/* Дедлайн-баннер */}
           <div
             className={`mb-5 flex items-center gap-3 rounded-2xl border p-4 ${style.bg} ${style.border}`}
           >
