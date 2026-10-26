@@ -14,6 +14,11 @@ import EditRequests from "../pages/EditRequests/EditRequests";
 import Deadlines from "../pages/Dedlines/Dedlines";
 import Stats from "../pages/Stats/Stats";
 
+// Импортируем новые страницы и защиту
+import UsersPage from "../pages/Users/UsersPage";
+import TasksPage from "../pages/Tasks/TasksPage";
+import { ProtectedRoute } from "../components/ProtectedRoute";
+
 export const Router = ({ user }) => {
   return (
     <Routes>
@@ -122,6 +127,30 @@ export const Router = ({ user }) => {
           <PageTransition>
             <Stats />
           </PageTransition>
+        }
+      />
+
+      {/* НОВЫЕ МАРШРУТЫ С ЗАЩИТОЙ */}
+      
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={[1, 2]}>
+            <PageTransition>
+              <UsersPage />
+            </PageTransition>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute allowedRoles={[1]}>
+            <PageTransition>
+              <TasksPage />
+            </PageTransition>
+          </ProtectedRoute>
         }
       />
     </Routes>

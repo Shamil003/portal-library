@@ -1,42 +1,38 @@
-// Modal.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import gerbLogo from "../assets/gerb.svg";
-import Userimg from "../assets/images/library.png";
+import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
+import { getAllUsers } from "../utils/mockUsers";
 
-export const Modal = ({ setUser, isOpen, onClose }) => {
+export const Modal = ({ isOpen, onClose }) => {
+  const { t } = useLanguage();
+  const { login } = useAuth(); // <-- Берем login из контекста
+  const navigate = useNavigate();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const navigate = useNavigate();
-
   const handleLogin = () => {
     if (!email || !password) {
-      setError("Заполните все поля");
+      setError(t("modal_err_empty"));
       return;
     }
 
-    const correctEmail = "test@gmail.com";
-    const correctPassword = "123456";
+    const user = getAllUsers().find(
+      (u) => u.email === email && u.password === password
+    );
 
-    if (email === correctEmail && password === correctPassword) {
-      const user = {
-        name: "Library",
-        email: email,
-        position: "китепканачы",
-        image: Userimg,
-      };
-
-      setUser(user);
-      onClose(); 
+    if (user) {
+      login(user); // Авторизуем
+      onClose(); // Закрываем модалку
       setEmail("");
       setPassword("");
       setError("");
       navigate("/profile");
     } else {
-      setError("Неверная почта или пароль");
+      setError(t("modal_err_wrong"));
     }
   };
 
@@ -58,13 +54,11 @@ export const Modal = ({ setUser, isOpen, onClose }) => {
           />
         </div>
 
-        <h1 className="mt-[24px] text-center text-[22px] leading-[27px] font-bold">
-          КЫРГЫЗ РЕСПУБЛИКАСЫНЫН
-          <br />
-          КИТЕПКАНАЛАР ПОРТАЛЫ
+        <h1 className="mt-[24px] text-center text-[22px] leading-[27px] font-bold whitespace-pre-line">
+          {t("modal_title")}
         </h1>
 
-        <p className="mt-[24px] text-center text-[16px]">Аккаунтка кирүү</p>
+        <p className="mt-[24px] text-center text-[16px]">{t("modal_login")}</p>
 
         <div className="flex flex-col gap-[25px]">
           <input
@@ -86,7 +80,7 @@ export const Modal = ({ setUser, isOpen, onClose }) => {
                 setPassword(e.target.value);
                 setError("");
               }}
-              placeholder="Сыр сөз"
+              placeholder={t("modal_password")}
               className="w-full h-[40px] bg-transparent border-b-2 border-white outline-none text-white placeholder:text-white placeholder:opacity-90"
             />
           </div>
@@ -101,7 +95,7 @@ export const Modal = ({ setUser, isOpen, onClose }) => {
             onClick={handleLogin}
             className="w-full h-[38px] rounded-full bg-[#E1E4F0] text-[#1C3458] text-[16px] font-medium cursor-pointer"
           >
-            Кирүү
+            {t("modal_btn")}
           </button>
         </div>
 

@@ -48,7 +48,7 @@ export const Header = ({ user, setUser, onLogout }) => {
           </button>
         </div>
       ) : (
-        <Modal setUser={setUser} />
+        <Modal isOpen={true} onClose={() => {}} />
       )}
     </header>
   );

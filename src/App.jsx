@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Sidebar } from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { Router } from "./router/Router";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
+import { useAuth } from "./context/AuthContext";
 
 const tabToPath = {
   home: "/",
@@ -16,6 +17,8 @@ const tabToPath = {
   "edit-requests": "/edit-requests",
   deadlines: "/deadlines",
   stats: "/stats",
+  users: "/users",
+  tasks: "/tasks",
 };
 
 const pathToTab = {
@@ -26,26 +29,16 @@ const pathToTab = {
   "/rep": "rep",
   "/reports": "reports",
   "/edit-requests": "edit-requests",
-  deadlines: "/deadlines",
+  "/deadlines": "deadlines",
   "/stats": "stats",
+  "/users": "users",
+  "/tasks": "tasks",
 };
 
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  }, [user]);
+  const { user, login, logout } = useAuth();
 
   useEffect(() => {
     if (!user && location.pathname !== "/login") {
@@ -57,7 +50,7 @@ const App = () => {
   }, [user, location.pathname, navigate]);
 
   if (!user) {
-    return <LoginPage setUser={setUser} />;
+    return <LoginPage setUser={login} />;
   }
 
   const activeTab = pathToTab[location.pathname] || "home";
@@ -69,14 +62,13 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    logout();
     navigate("/login", { replace: true });
   };
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-800 font-sans overflow-hidden">
       <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
-
       <main className="flex-1 p-8 overflow-y-auto">
         <Header user={user} onLogout={handleLogout} />
         <Router user={user} />

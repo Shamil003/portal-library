@@ -1,10 +1,12 @@
 import { useState } from "react";
 import gerbLogo from "../../assets/gerb.svg";
-import Userimg from "../../assets/images/library.png";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext"; // <-- Импортируем AuthContext
+import { getAllUsers } from "../../utils/mockUsers"; // <-- Импортируем функцию получения всех пользователей
 
-export const LoginPage = ({ setUser }) => {
+export const LoginPage = () => {
   const { t } = useLanguage();
+  const { login } = useAuth(); // <-- Берем функцию login из контекста
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,16 +17,13 @@ export const LoginPage = ({ setUser }) => {
       return;
     }
 
-    const correctEmail = "test@gmail.com";
-    const correctPassword = "123456";
+    // Ищем пользователя среди тестовых И созданных аккаунтов
+    const user = getAllUsers().find(
+      (u) => u.email === email && u.password === password
+    );
 
-    if (email === correctEmail && password === correctPassword) {
-      setUser({
-        name: "Library",
-        email,
-        position: "китепканачы",
-        image: Userimg,
-      });
+    if (user) {
+      login(user); // Сохраняем пользователя и его роль
     } else {
       setError(t("modal_err_wrong"));
     }
