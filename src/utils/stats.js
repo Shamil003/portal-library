@@ -1,15 +1,12 @@
-// src/utils/stats.js
+import { translations } from "../context/LanguageContext";
 
-/** Безопасное число */
 const num = (v) => Number(v) || 0;
 
-/** Отчёт считается просроченным */
 export const isOverdue = (r) => {
   if (!r?.deadline) return false;
   return new Date() > new Date(r.deadline) && r.status !== "Отправлен";
 };
 
-/** Отчёт считается сданным вовремя */
 export const isOnTime = (r) => {
   if (!r?.deadline || !r?.date) return false;
   try {
@@ -19,10 +16,8 @@ export const isOnTime = (r) => {
   }
 };
 
-/** Общие KPI */
 export const computeKpi = (reports) => {
   const total = reports.length;
-
   const onTime = reports.filter(isOnTime).length;
   const overdue = reports.filter(isOverdue).length;
 
@@ -43,7 +38,6 @@ export const computeKpi = (reports) => {
   };
 };
 
-/** Группировка по месяцам (последние 6 месяцев) */
 export const groupByMonth = (reports) => {
   const now = new Date();
   const months = [];
@@ -76,7 +70,6 @@ export const groupByMonth = (reports) => {
   return months;
 };
 
-/** Группировка по регионам */
 export const groupByRegion = (reports) => {
   const map = new Map();
 
@@ -103,8 +96,7 @@ export const groupByRegion = (reports) => {
   return Array.from(map.values()).sort((a, b) => b.visitors - a.visitors);
 };
 
-/** Статусы отчётов (для кольцевой диаграммы) */
-export const statusBreakdown = (reports) => {
+export const statusBreakdown = (reports, lang = "kg") => {
   let onTime = 0;
   let overdue = 0;
   let pending = 0;
@@ -115,29 +107,35 @@ export const statusBreakdown = (reports) => {
     else pending += 1;
   });
 
+  const t = (key) => translations[lang]?.[key] || key;
+
   return [
-    { key: "onTime", label: "Убагында", value: onTime, color: "#20A35A" },
-    { key: "pending", label: "Күтүүдө", value: pending, color: "#F59E0B" },
-    { key: "overdue", label: "Мөөнөтү өткөн", value: overdue, color: "#DC2626" },
+    { key: "onTime", label: t("stats_status_ontime"), value: onTime, color: "#20A35A" },
+    { key: "pending", label: t("stats_status_pending"), value: pending, color: "#F59E0B" },
+    { key: "overdue", label: t("stats_status_overdue"), value: overdue, color: "#DC2626" },
   ];
 };
 
-/** Состав посетителей для stacked bar */
-export const visitorsBreakdown = (reports) => {
-  const sum = (field) =>
-    reports.reduce((s, r) => s + num(r[field]), 0);
+export const visitorsBreakdown = (reports, lang = "kg") => {
+  const sum = (field) => reports.reduce((s, r) => s + num(r[field]), 0);
+  const t = (key) => translations[lang]?.[key] || key;
 
   return [
-    { key: "men", label: "Эркектер", value: sum("visitMen"), color: "#1C3458" },
-    { key: "women", label: "Аялдар", value: sum("visitWomen"), color: "#3B6EA5" },
-    { key: "children", label: "Балдар", value: sum("visitChildren"), color: "#F59E0B" },
-    { key: "youth", label: "Жаштар", value: sum("visitYouth"), color: "#20A35A" },
+    { key: "men", label: t("stats_v_men"), value: sum("visitMen"), color: "#1C3458" },
+    { key: "women", label: t("stats_v_women"), value: sum("visitWomen"), color: "#3B6EA5" },
+    { key: "children", label: t("stats_v_children"), value: sum("visitChildren"), color: "#F59E0B" },
+    { key: "youth", label: t("stats_v_youth"), value: sum("visitYouth"), color: "#20A35A" },
   ];
 };
 
-/** Форматирование больших чисел */
-export const formatNumber = (n) => {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(".", ",") + " млн";
-  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(".", ",") + " миң";
+export const formatNumber = (n, lang = "kg") => {
+  const t = (key) => translations[lang]?.[key] || key;
+  
+  if (n >= 1_000_000) {
+    return (n / 1_000_000).toFixed(1).replace(".", ",") + " " + t("format_million");
+  }
+  if (n >= 1_000) {
+    return (n / 1_000).toFixed(1).replace(".", ",") + " " + t("format_thousand");
+  }
   return String(n);
 };

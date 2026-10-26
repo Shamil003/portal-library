@@ -1,16 +1,17 @@
 import { useState } from "react";
-
 import gerbLogo from "../../assets/gerb.svg";
 import Userimg from "../../assets/images/library.png";
+import { useLanguage } from "../../context/LanguageContext";
 
 export const LoginPage = ({ setUser }) => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleLogin = () => {
     if (!email || !password) {
-      setError("Заполните все поля");
+      setError(t("modal_err_empty"));
       return;
     }
 
@@ -25,7 +26,7 @@ export const LoginPage = ({ setUser }) => {
         image: Userimg,
       });
     } else {
-      setError("Неверная почта или пароль");
+      setError(t("modal_err_wrong"));
     }
   };
 
@@ -40,13 +41,11 @@ export const LoginPage = ({ setUser }) => {
           />
         </div>
 
-        <h1 className="mt-[24px] text-center text-[22px] leading-[27px] font-bold">
-          КЫРГЫЗ РЕСПУБЛИКАСЫНЫН
-          <br />
-          КИТЕПКАНАЛАР ПОРТАЛЫ
+        <h1 className="mt-[24px] text-center text-[22px] leading-[27px] font-bold whitespace-pre-line">
+          {t("modal_title")}
         </h1>
 
-        <p className="mt-[24px] text-center text-[16px]">Аккаунтка кирүү</p>
+        <p className="mt-[24px] text-center text-[16px]">{t("modal_login")}</p>
 
         <div className="flex flex-col gap-[25px]">
           <input
@@ -67,7 +66,7 @@ export const LoginPage = ({ setUser }) => {
               setPassword(e.target.value);
               setError("");
             }}
-            placeholder="Сыр сөз"
+            placeholder={t("modal_password")}
             className="w-full h-[40px] bg-transparent border-b-2 border-white outline-none text-white placeholder:text-white placeholder:opacity-90"
           />
 
@@ -81,7 +80,7 @@ export const LoginPage = ({ setUser }) => {
             onClick={handleLogin}
             className="w-full h-[38px] rounded-full bg-[#E1E4F0] text-[#1C3458] text-[16px] font-medium cursor-pointer"
           >
-            Кирүү
+            {t("modal_btn")}
           </button>
         </div>
       </div>

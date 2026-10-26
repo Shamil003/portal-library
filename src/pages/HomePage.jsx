@@ -11,7 +11,6 @@ import {
   FileEdit,
   ArrowRight,
   CalendarDays,
-  Users,
 } from "lucide-react";
 
 import {
@@ -20,15 +19,49 @@ import {
   formatTimeLeft,
   deadlineStyles,
 } from "../utils/deadline";
+import { useLanguage } from "../context/LanguageContext"; // Проверь путь (возможно, ../../)
 
 const REPORTS_KEY = "libraryReports";
 const REQUESTS_KEY = "editRequests";
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const { lang, t } = useLanguage();
 
   const [reports, setReports] = useState([]);
   const [requests, setRequests] = useState([]);
+
+  // Функция перевода названий библиотек и регионов
+  const translateName = (text, type) => {
+    if (!text) return text;
+    
+    if (type === "library") {
+      if (lang === "ru") {
+        return text
+          .replace(/китепкана/gi, "библиотека")
+          .replace(/Китепкана/gi, "Библиотека")
+          .replace(/борбордук/gi, "центральная")
+          .replace(/Борбордук/gi, "Центральная")
+          .replace(/райондук/gi, "районная")
+          .replace(/району/gi, "района");
+      }
+      return text;
+    }
+
+    if (type === "region") {
+      const regionMap = {
+        "Баткен облусу": "reg_batken", "Чүй облусу": "reg_chuy", "Жалал-Абад облусу": "reg_jalal_abad",
+        "Нарын облусу": "reg_naryn", "Ош облусу": "reg_osh", "Талас облусу": "reg_talas",
+        "Ысык-Көл облусу": "reg_issyk_kul", "Бишкек шаары": "reg_bishkek", "Ош шаары": "reg_osh_city",
+        "Баткенская область": "reg_batken", "Чуйская область": "reg_chuy", "Джалал-Абадская область": "reg_jalal_abad",
+        "Нарынская область": "reg_naryn", "Ошская область": "reg_osh", "Таласская область": "reg_talas",
+        "Иссык-Кульская область": "reg_issyk_kul", "город Бишкек": "reg_bishkek", "город Ош": "reg_osh_city",
+      };
+      const key = regionMap[text];
+      return key ? t(key) : text;
+    }
+    return text;
+  };
 
   const user = useMemo(() => {
     try {
@@ -63,7 +96,6 @@ export const HomePage = () => {
     return { total, sent, editing, overdue, libraries, pendingRequests };
   }, [reports, requests]);
 
-  // Ближайшие дедлайны
   const upcoming = useMemo(() => {
     return [...reports]
       .filter((r) => r.deadline)
@@ -72,7 +104,6 @@ export const HomePage = () => {
       .slice(0, 3);
   }, [reports]);
 
-  // Последние отправленные
   const recent = useMemo(() => {
     return [...reports]
       .filter((r) => r.date)
@@ -80,7 +111,6 @@ export const HomePage = () => {
       .slice(0, 5);
   }, [reports]);
 
-  // Данные для мини-графика по месяцам
   const monthly = useMemo(() => {
     const now = new Date();
     const buckets = [];
@@ -114,16 +144,15 @@ export const HomePage = () => {
 
   return (
     <div className="space-y-6">
-      {/* 1. Приветствие */}
       <div className="rounded-2xl bg-gradient-to-r from-[#1C3458] to-[#3B6EA5] p-6 text-white shadow-[0_4px_20px_rgba(28,52,88,0.15)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-white/70">{today}</p>
             <h1 className="mt-1 text-2xl font-semibold">
-              Салам, {user?.name || "колдонуучу"}!
+              {t("home_greeting")}, {user?.name || t("home_user")}!
             </h1>
             <p className="mt-1 text-sm text-white/80">
-              Бүгүнкү күндүн кыскача статистикасы
+              {t("home_today_stats")}
             </p>
           </div>
 
@@ -132,66 +161,64 @@ export const HomePage = () => {
             className="flex items-center gap-2 self-start rounded-xl bg-white px-5 py-3 text-sm font-medium text-[#1C3458] shadow-sm transition hover:bg-[#F3F6FA] sm:self-auto"
           >
             <Plus size={18} />
-            Жаңы отчёт түзүү
+            {t("home_new_report")}
           </button>
         </div>
       </div>
 
-      {/* 2. KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <KpiCard
           icon={<FileText size={20} />}
-          label="Бардык отчёттор"
+          label={t("home_all_reports")}
           value={stats.total}
           color="#1C3458"
           onClick={() => navigate("/reports")}
         />
         <KpiCard
           icon={<CheckCircle2 size={20} />}
-          label="Жөнөтүлгөн"
+          label={t("home_sent")}
           value={stats.sent}
           color="#20A35A"
           onClick={() => navigate("/reports")}
         />
         <KpiCard
           icon={<FileEdit size={20} />}
-          label="Редактирлөөдө"
+          label={t("home_editing")}
           value={stats.editing}
           color="#F59E0B"
         />
         <KpiCard
           icon={<AlertTriangle size={20} />}
-          label="Мөөнөтү өткөн"
+          label={t("home_overdue")}
           value={stats.overdue}
           color="#DC2626"
           onClick={() => navigate("/deadlines")}
         />
         <KpiCard
           icon={<Library size={20} />}
-          label="Китепканалар"
+          label={t("home_libraries")}
           value={stats.libraries}
           color="#3B6EA5"
           onClick={() => navigate("/libraries")}
         />
       </div>
 
-      {/* 3. Срочные дедлайны + быстрые действия */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)] lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-[18px] font-semibold text-[#1C3458]">
-                Жакын арада мөөнөтү бүтөт
+                {t("home_upcoming")}
               </h2>
               <p className="mt-1 text-sm text-[#8992A3]">
-                Кызыл — мөөнөтү өткөн, сары — жакында
+                {t("home_upcoming_desc")}
               </p>
             </div>
             <button
               onClick={() => navigate("/deadlines")}
               className="flex items-center gap-1 text-sm font-medium text-[#1C3458] hover:underline"
             >
-              Баары
+              {t("home_all")}
               <ArrowRight size={16} />
             </button>
           </div>
@@ -203,7 +230,7 @@ export const HomePage = () => {
                 className="mx-auto mb-2 text-[#20A35A]"
               />
               <p className="text-sm font-medium text-[#167A42]">
-                Бардык отчёттор убагында тапшырылган
+                {t("home_all_submitted")}
               </p>
             </div>
           ) : (
@@ -230,17 +257,17 @@ export const HomePage = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-[#1C3458]">
-                          {r.library}
+                          {translateName(r.library, "library")}
                         </p>
                         <p className="text-xs text-[#8992A3]">
-                          {r.region} · {formatDeadline(r.deadline)}
+                          {translateName(r.region, "region")} · {formatDeadline(r.deadline)}
                         </p>
                       </div>
                     </div>
                     <span
                       className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold ${style.badge}`}
                     >
-                      {formatTimeLeft(r.deadline)}
+                      {formatTimeLeft(r.deadline, lang)}
                     </span>
                   </button>
                 );
@@ -249,33 +276,32 @@ export const HomePage = () => {
           )}
         </div>
 
-        {/* Быстрые действия */}
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <h2 className="mb-4 text-[18px] font-semibold text-[#1C3458]">
-            Тез аракеттер
+            {t("home_quick_actions")}
           </h2>
 
           <div className="space-y-2">
             <QuickAction
               icon={<Plus size={18} />}
-              label="Жаңы отчёт түзүү"
+              label={t("home_new_report")}
               onClick={() => navigate("/rep")}
             />
             <QuickAction
               icon={<BarChart3 size={18} />}
-              label="Статистика"
+              label={t("nav_stats")}
               onClick={() => navigate("/stats")}
             />
             <QuickAction
               icon={<Clock3 size={18} />}
-              label="Мөөнөттөр"
+              label={t("nav_deadlines")}
               onClick={() => navigate("/deadlines")}
               badge={stats.overdue > 0 ? stats.overdue : null}
               badgeColor="#DC2626"
             />
             <QuickAction
               icon={<FileEdit size={18} />}
-              label="Редактирлөө сурамдары"
+              label={t("nav_editRequests")}
               onClick={() => navigate("/edit-requests")}
               badge={
                 stats.pendingRequests > 0 ? stats.pendingRequests : null
@@ -286,9 +312,7 @@ export const HomePage = () => {
         </div>
       </div>
 
-      {/* 4. Мини-график + последние отчёты */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* График */}
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF1FA]">
@@ -296,10 +320,10 @@ export const HomePage = () => {
             </div>
             <div>
               <h2 className="text-[18px] font-semibold text-[#1C3458]">
-                Акыркы 6 ай
+                {t("home_last_6_months")}
               </h2>
               <p className="text-sm text-[#8992A3]">
-                Айына жөнөтүлгөн отчёттор
+                {t("home_reports_per_month")}
               </p>
             </div>
           </div>
@@ -307,29 +331,28 @@ export const HomePage = () => {
           <MiniBarChart data={monthly} />
         </div>
 
-        {/* Последние отчёты */}
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-[18px] font-semibold text-[#1C3458]">
-                Акыркы отчёттор
+                {t("home_recent_reports")}
               </h2>
               <p className="mt-1 text-sm text-[#8992A3]">
-                Эң акыркы жөнөтүлгөндөр
+                {t("home_recent_submitted")}
               </p>
             </div>
             <button
               onClick={() => navigate("/reports")}
               className="flex items-center gap-1 text-sm font-medium text-[#1C3458] hover:underline"
             >
-              Баары
+              {t("home_all")}
               <ArrowRight size={16} />
             </button>
           </div>
 
           {recent.length === 0 ? (
             <p className="py-6 text-center text-sm text-[#8992A3]">
-              Отчёттор жок
+              {t("reports_not_found")}
             </p>
           ) : (
             <div className="space-y-2">
@@ -343,10 +366,10 @@ export const HomePage = () => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-[#1C3458]">
-                      {r.library}
+                      {translateName(r.library, "library")}
                     </p>
                     <p className="text-xs text-[#8992A3]">
-                      {r.region} · {r.date}
+                      {translateName(r.region, "region")} · {r.date}
                     </p>
                   </div>
                   <span className="shrink-0 rounded-lg bg-[#EAF1FA] px-2 py-1 text-xs font-medium text-[#1C3458]">
@@ -362,9 +385,7 @@ export const HomePage = () => {
   );
 };
 
-/* =========================
-   KPI-карточка
-========================= */
+
 const KpiCard = ({ icon, label, value, color, onClick }) => (
   <button
     type="button"
@@ -386,9 +407,6 @@ const KpiCard = ({ icon, label, value, color, onClick }) => (
   </button>
 );
 
-/* =========================
-   Быстрое действие
-========================= */
 const QuickAction = ({ icon, label, onClick, badge, badgeColor }) => (
   <button
     type="button"
@@ -412,9 +430,6 @@ const QuickAction = ({ icon, label, onClick, badge, badgeColor }) => (
   </button>
 );
 
-/* =========================
-   Мини-график
-========================= */
 const MiniBarChart = ({ data }) => {
   const max = Math.max(...data.map((d) => d.count), 1);
 

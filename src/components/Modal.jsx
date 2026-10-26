@@ -30,7 +30,7 @@ export const Modal = ({ setUser, isOpen, onClose }) => {
       };
 
       setUser(user);
-      onClose(); // закрываем через родителя
+      onClose(); 
       setEmail("");
       setPassword("");
       setError("");

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 const AnimatedSearch = ({ value, onChange }) => {
+  const { t } = useLanguage();
   const [placeholder, setPlaceholder] = useState("");
 
   useEffect(() => {
-    const text = "Издөө...";
+    const text = t("search_ph"); // Берем текст из словаря
     let index = 0;
     let deleting = false;
     let timeout;
@@ -39,7 +41,7 @@ const AnimatedSearch = ({ value, onChange }) => {
     animate();
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [t]); // <-- ВАЖНО: добавили t, чтобы анимация перезапускалась при смене языка
 
   return (
     <div className="relative mb-6">

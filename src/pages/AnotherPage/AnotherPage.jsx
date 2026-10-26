@@ -3,6 +3,7 @@ import { Library } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AnotherCard from "./AnotherCard.jsx";
 import AnimatedSearch from "../../components/AnimatedSearch";
+import { useLanguage } from "../../context/LanguageContext";
 
 import img8 from "./img/add.svg";
 import img90 from "./img/Group 49.svg";
@@ -11,28 +12,38 @@ import img70 from "./img/Group 29.svg";
 const AnotherPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   const region = location.state?.region;
   const library = location.state?.library;
 
   const [search, setSearch] = useState("");
 
+  // Функция для перевода названий библиотек на лету
+  const translateLibraryName = (name) => {
+    if (!name) return name;
+    return name
+      .replace(/Китепкананын аты/gi, t("card_library_name") || "Название библиотеки")
+      .replace(/китепкана/gi, "библиотека")
+      .replace(/Китепкана/gi, "Библиотека");
+  };
+
   const cards = [
     {
       id: 14,
-      title: "Башкы таблица",
+      title: t("card_main_table"),
       icon: img8,
       completed: true,
     },
     {
       id: 16,
-      title: "Материалдык тех. база",
+      title: t("card_material_tech"),
       icon: img70,
       completed: false,
     },
     {
       id: 18,
-      title: "Информациялык ресурстар",
+      title: t("card_info_res"),
       icon: img90,
       completed: true,
     },
@@ -69,7 +80,7 @@ const AnotherPage = () => {
           onClick={() => navigate("/libraries")}
           className="cursor-pointer transition hover:text-blue-600"
         >
-          Китепканалар
+          {t("lib_title")}
         </span>
 
         <span className="text-gray-400">/</span>
@@ -78,17 +89,16 @@ const AnotherPage = () => {
           onClick={handleBack}
           className="cursor-pointer transition hover:text-blue-600"
         >
-          {region?.name || "Ош облусу"}
+          {region?.name || t("reg_osh")}
         </span>
 
         <span className="text-gray-400">/</span>
 
         <span className="font-bold text-slate-800">
-          {library?.name || "Китепкананын аты"}
+          {translateLibraryName(library?.name) || t("card_library_name")}
         </span>
       </div>
 
-      {/* Статистика */}
       <div className="mb-6">
         <div className="w-[200px] rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
@@ -96,7 +106,7 @@ const AnotherPage = () => {
           </div>
 
           <p className="text-[10px] font-semibold uppercase text-gray-500">
-            Жалпы китепканалар
+            {t("lib_total")}
           </p>
 
           <div className="mt-1 text-2xl font-bold">
@@ -105,13 +115,11 @@ const AnotherPage = () => {
         </div>
       </div>
 
-      {/* Поиск */}
       <AnimatedSearch
         value={search}
         onChange={setSearch}
       />
 
-      {/* Карточки */}
       <div className="mt-4 flex flex-wrap gap-4">
         {filteredCards.map((card) => (
           <div
