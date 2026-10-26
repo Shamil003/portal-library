@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, XCircle, FileEdit } from "lucide-react";
+import { CheckCircle2, XCircle, FileEdit, AlertCircle } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext"; // <-- Импортируем авторизацию
+import { getRegisteredUsers, getLibraries } from "../../utils/mockUsers"; // <-- Для проверки иерархии
 
 const STORAGE_KEY = "libraryReports";
 const EDIT_REQUESTS_KEY = "editRequests";
 
 const EditRequests = () => {
   const { lang, t } = useLanguage();
+  const { user } = useAuth(); // <-- Получаем текущего юзера
+  
   const [requests, setRequests] = useState([]);
   const [reports, setReports] = useState([]);
+  const [allLibraries, setAllLibraries] = useState([]);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = "success") => {
@@ -16,29 +21,12 @@ const EditRequests = () => {
     setTimeout(() => { setToast(null); }, 2000);
   };
 
-  // Функция для перевода названий библиотек "на лету"
-  const translateLibraryName = (name) => {
-    if (!name) return name;
-    if (lang === "ru") {
-      return name
-        .replace(/китепкана/gi, "библиотека")
-        .replace(/Китепкана/gi, "Библиотека")
-        .replace(/борбордук/gi, "центральная")
-        .replace(/Борбордук/gi, "Центральная")
-        .replace(/райондук/gi, "районная");
-    } else {
-      return name
-        .replace(/библиотека/gi, "китепкана")
-        .replace(/Библиотека/gi, "Китепкана")
-        .replace(/центральная/gi, "борбордук")
-        .replace(/Центральная/gi, "Борбордук")
-        .replace(/районная/gi, "райондук");
-    }
-  };
-
   useEffect(() => {
     const savedRequests = JSON.parse(localStorage.getItem(EDIT_REQUESTS_KEY) || "[]");
     const savedReports = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    // Собираем все библиотеки (тестовые + созданные), чтобы знать их parentId
+    const libs = getLibraries();
+    setAllLibraries(libs);
     setRequests(savedRequests);
     setReports(savedReports);
   }, []);
@@ -57,6 +45,12 @@ const EditRequests = () => {
     const request = requests.find((r) => r.id === requestId);
     if (!request) return;
 
+    // Проверка прав: 4-й уровень (и 3-й) не может одобрять
+    if (user?.role > 2) {
+      showToast("Сизде буга укук жок", "error");
+      return;
+    }
+
     const updatedRequests = requests.map((r) =>
       r.id === requestId ? { ...r, status: decision, decidedAt: new Date().toLocaleString("ru-RU") } : r
     );
@@ -74,8 +68,45 @@ const EditRequests = () => {
     showToast(decision === "approved" ? t("edit_req_approved") : t("edit_req_rejected"), decision === "approved" ? "success" : "error");
   };
 
-  const pending = requests.filter((r) => r.status === "pending");
-  const processed = requests.filter((r) => r.status !== "pending");
+  // ФИЛЬТРАЦИЯ ЗАПРОСОВ ПО ИЕРАРХИИ
+  const getVisibleRequests = (list) => {
+    if (!user) return [];
+    if (user.role === 1) return list; // НБКР видит всё
+
+    if (user.role === 2) {
+      // Областная видит свои запросы + запросы своих дочерних библиотек
+      return list.filter(req => {
+        const report = reports.find(r => r.id === req.reportId);
+        if (!report) return false;
+        
+        // Если запрос от самой областной библиотеки
+        if (report.library === user.libraryName) return true;
+        
+        // Ищем библиотеку, от которой пришел отчет, в списке созданных
+        const lib = allLibraries.find(l => l.name === report.library);
+        return lib?.parentId === user.libraryId; 
+      });
+    }
+
+    // 3 и 4 уровень видят только свои запросы (они не могут их одобрять)
+    return list.filter(req => {
+      const report = reports.find(r => r.id === req.reportId);
+      return report?.library === user.libraryName;
+    });
+  };
+
+  const visibleRequests = getVisibleRequests(requests);
+  const pending = visibleRequests.filter((r) => r.status === "pending");
+  const processed = visibleRequests.filter((r) => r.status !== "pending");
+
+  // Функция для перевода названий
+  const translateLibraryName = (name) => {
+    if (!name) return name;
+    if (lang === "ru") {
+      return name.replace(/китепкана/gi, "библиотека").replace(/Китепкана/gi, "Библиотека");
+    }
+    return name;
+  };
 
   return (
     <div className="min-h-full bg-[#F3F5F9] px-6 py-6">
@@ -90,8 +121,20 @@ const EditRequests = () => {
           </div>
         </div>
 
+        {/* Если уровень 3 или 4, показываем предупреждение */}
+        {user?.role > 2 && (
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[#FCD34D] bg-[#FFF7E6] p-4">
+            <AlertCircle size={22} className="text-[#D28A00]" />
+            <p className="text-sm font-medium text-[#B87500]">
+              Сиздин деңгээлиңиз башкалардын сурамдарын жактырууга жеткиликсиз. Сиз өз сурамыңыздын статусун гана көрө аласыз.
+            </p>
+          </div>
+        )}
+
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
-          <h2 className="mb-4 text-[18px] font-semibold text-[#1C3458]">{t("edit_req_pending")} ({pending.length})</h2>
+          <h2 className="mb-4 text-[18px] font-semibold text-[#1C3458]">
+            {t("edit_req_pending")} ({pending.length})
+          </h2>
           {pending.length === 0 ? (
             <p className="py-6 text-center text-sm text-[#8992A3]">{t("edit_req_no_pending")}</p>
           ) : (
@@ -107,14 +150,22 @@ const EditRequests = () => {
                       <p className="mt-1 text-xs text-[#8992A3]">{report?.region} · {report?.period}</p>
                       <p className="mt-1 text-xs text-[#8992A3]">{t("edit_req_requested")}: {req.requestedAt}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleDecision(req.id, "approved")} className="flex h-10 items-center gap-2 rounded-lg bg-[#20A35A] px-4 text-sm font-medium text-white transition hover:bg-[#188A4B]">
-                        <CheckCircle2 size={16} /> {t("edit_req_approve")}
-                      </button>
-                      <button onClick={() => handleDecision(req.id, "rejected")} className="flex h-10 items-center gap-2 rounded-lg bg-[#DC2626] px-4 text-sm font-medium text-white transition hover:bg-[#B91C1C]">
-                        <XCircle size={16} /> {t("edit_req_reject")}
-                      </button>
-                    </div>
+                    
+                    {/* Кнопки показываем только тем, кто может одобрять */}
+                    {user?.role <= 2 ? (
+                      <div className="flex gap-2">
+                        <button onClick={() => handleDecision(req.id, "approved")} className="flex h-10 items-center gap-2 rounded-lg bg-[#20A35A] px-4 text-sm font-medium text-white transition hover:bg-[#188A4B]">
+                          <CheckCircle2 size={16} /> {t("edit_req_approve")}
+                        </button>
+                        <button onClick={() => handleDecision(req.id, "rejected")} className="flex h-10 items-center gap-2 rounded-lg bg-[#DC2626] px-4 text-sm font-medium text-white transition hover:bg-[#B91C1C]">
+                          <XCircle size={16} /> {t("edit_req_reject")}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="rounded-lg bg-[#FFF7E6] px-3 py-2 text-xs font-medium text-[#B87500]">
+                        Күтүүдө
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -139,7 +190,6 @@ const EditRequests = () => {
                       <p className="mt-1 text-xs text-[#8992A3]">{t("edit_req_decided")}: {req.decidedAt || "—"}</p>
                     </div>
                     
-                    {/* Статус теперь всегда будет виден */}
                     <div className={`flex items-center shrink-0 gap-2 rounded-lg px-3 py-2 text-xs font-medium ${req.status === "approved" ? "bg-[#F0FBF4] text-[#167A42]" : "bg-[#FEF2F2] text-[#B91C1C]"}`}>
                       {req.status === "approved" ? (
                         <>

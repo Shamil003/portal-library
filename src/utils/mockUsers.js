@@ -43,6 +43,7 @@ export const MOCK_USERS = [
   },
 ];
 
+// --- ПОЛЬЗОВАТЕЛИ ---
 export const getRegisteredUsers = () => {
   try {
     return JSON.parse(localStorage.getItem("registeredUsers") || "[]");
@@ -59,4 +60,19 @@ export const addRegisteredUser = (user) => {
 
 export const getAllUsers = () => {
   return [...MOCK_USERS, ...getRegisteredUsers()];
+};
+
+// --- БИБЛИОТЕКИ ---
+export const getLibraries = () => {
+  try {
+    return JSON.parse(localStorage.getItem("librariesList") || "[]");
+  } catch {
+    return [];
+  }
+};
+
+export const addLibrary = (library) => {
+  const libs = getLibraries();
+  libs.push(library);
+  localStorage.setItem("librariesList", JSON.stringify(libs));
 };
