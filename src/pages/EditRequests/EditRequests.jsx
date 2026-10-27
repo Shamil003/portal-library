@@ -4,7 +4,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import { getRegisteredUsers, getLibraries } from "../../utils/mockUsers";
 
-const STORAGE_KEY = "allReports"; 
+const STORAGE_KEY = "allReports";
 const EDIT_REQUESTS_KEY = "editRequests";
 
 const EditRequests = () => {
@@ -121,7 +121,7 @@ const EditRequests = () => {
           <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[#FCD34D] bg-[#FFF7E6] p-4">
             <AlertCircle size={22} className="text-[#D28A00]" />
             <p className="text-sm font-medium text-[#B87500]">
-              Сиздин деңгээлиңиз башкалардын сурамдарын жактырууга жеткиликсиз. Сиз өз сурамыңыздын статусун гана көрө аласыз.
+              {t("edit_req_no_rights")} {/* <-- ЗАМЕНИЛИ ТЕКСТ */}
             </p>
           </div>
         )}
