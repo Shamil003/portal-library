@@ -146,10 +146,8 @@ export const HomePage = () => {
   return (
     <div className="space-y-6">
       
-      {/* 1. КАРТОЧКА ДИРЕКТОРА */}
       {/* <DirectorCard /> */}
 
-      {/* 2. ПРИВЕТСТВИЕ */}
       <div className="rounded-2xl bg-gradient-to-r from-[#1C3458] to-[#3B6EA5] p-6 text-white shadow-[0_4px_20px_rgba(28,52,88,0.15)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
