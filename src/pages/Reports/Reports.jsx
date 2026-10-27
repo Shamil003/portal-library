@@ -4,15 +4,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDeadlineStatus, formatTimeLeft, formatDeadline, deadlineStyles } from "../../utils/deadline";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
+import { getLibraries } from "../../utils/mockUsers";
 
 const EDIT_REQUESTS_KEY = "editRequests";
 
 export const Reports = () => {
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
+  const { user } = useAuth();
 
   const [search, setSearch] = useState("");
   const [reports, setReports] = useState([]);
+  const [allLibraries, setAllLibraries] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [toast, setToast] = useState(null);
   const [, setTick] = useState(0);
@@ -27,7 +31,6 @@ export const Reports = () => {
     setTimeout(() => setToast(null), 2000);
   };
 
-  // Функция перевода названий регионов на лету
   const translateRegion = (regionName) => {
     if (!regionName) return regionName;
     const regionMap = {
@@ -37,23 +40,36 @@ export const Reports = () => {
       "Баткенская область": "reg_batken", "Чуйская область": "reg_chuy", "Джалал-Абадская область": "reg_jalal_abad",
       "Нарынская область": "reg_naryn", "Ошская область": "reg_osh", "Таласская область": "reg_talas",
       "Иссык-Кульская область": "reg_issyk_kul", "город Бишкек": "reg_bishkek", "город Ош": "reg_osh_city",
+      "Кыргызстан": "reg_kyrgyzstan",
     };
     const key = regionMap[regionName];
     return key ? t(key) : regionName;
   };
 
   useEffect(() => {
-    const stat = JSON.parse(localStorage.getItem("libraryReports") || "[]").map((r) => ({ ...r, type: r.type || "stat" }));
-    const quarter = JSON.parse(localStorage.getItem("quarterlyReports") || "[]").map((r) => ({ ...r, type: "quarterly" }));
-    setReports([...stat, ...quarter]);
+    const all = JSON.parse(localStorage.getItem("allReports") || "[]");
+    setReports(all);
+    setAllLibraries(getLibraries());
   }, []);
+
+  const getVisibleReports = (list) => {
+    if (!user) return [];
+    if (user.role === 1) return list;
+    if (user.role === 2) {
+      return list.filter(r => {
+        if (r.region === user.region) return true;
+        const lib = allLibraries.find(l => l.name === r.library);
+        return lib?.parentId === user.libraryId;
+      });
+    }
+    return list.filter(r => r.library === user.libraryName);
+  };
+
+  const visibleReports = getVisibleReports(reports);
 
   const updateReports = (newReports) => {
     setReports(newReports);
-    const stat = newReports.filter((r) => r.type !== "quarterly");
-    const quarter = newReports.filter((r) => r.type === "quarterly");
-    localStorage.setItem("libraryReports", JSON.stringify(stat));
-    localStorage.setItem("quarterlyReports", JSON.stringify(quarter));
+    localStorage.setItem("allReports", JSON.stringify(newReports));
   };
 
   const handleEdit = (report) => {
@@ -72,7 +88,7 @@ export const Reports = () => {
     const exists = requests.find((r) => r.reportId === reportId && r.status === "pending");
     if (exists) { showToast(t("toast_sent")); return; }
 
-    const newRequest = { id: Date.now(), reportId, status: "pending", requestedAt: new Date().toLocaleString("ru-RU") };
+    const newRequest = { id: Date.now(), reportId, status: "pending", requestedAt: new Date().toLocaleString("ru-RU", { timeZone: "Asia/Bishkek", day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) };
     requests.push(newRequest);
     localStorage.setItem(EDIT_REQUESTS_KEY, JSON.stringify(requests));
 
@@ -85,14 +101,17 @@ export const Reports = () => {
     showToast(t("toast_sent"));
   };
 
-  const filteredReports = reports.filter((report) =>
-    `${report.library} ${report.region} ${report.period}`.toLowerCase().includes(search.toLowerCase())
-  );
+  // СОРТИРОВКА: Новые отчеты сверху (по убыванию ID)
+  const filteredReports = visibleReports
+    .filter((report) =>
+      `${report.library} ${report.region} ${report.period}`.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => b.id - a.id);
 
-  const totalReports = reports.length;
-  const sentReports = reports.filter((r) => r.status === "Отправлен").length;
-  const editingReports = reports.filter((r) => r.status === "На редактировании").length;
-  const overdueReports = reports.filter((r) => getDeadlineStatus(r.deadline).status === "overdue").length;
+  const totalReports = visibleReports.length;
+  const sentReports = visibleReports.filter((r) => r.status === "Отправлен").length;
+  const editingReports = visibleReports.filter((r) => r.status === "На редактировании").length;
+  const overdueReports = visibleReports.filter((r) => getDeadlineStatus(r.deadline).status === "overdue").length;
 
   return (
     <div className="min-h-full bg-[#F3F5F9] px-6 py-6">

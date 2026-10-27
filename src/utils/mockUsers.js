@@ -9,6 +9,7 @@ export const MOCK_USERS = [
     role: 1,
     libraryId: "nbkr-main",
     libraryName: "НБКР имени Алыкула Осмонова",
+    region: "Кыргызстан",
     image: Userimg,
   },
   {
@@ -19,6 +20,7 @@ export const MOCK_USERS = [
     role: 2,
     libraryId: "oblast-osh",
     libraryName: "Ошская областная библиотека",
+    region: "Ош облусу",
     image: Userimg,
   },
   {
@@ -29,6 +31,7 @@ export const MOCK_USERS = [
     role: 3,
     libraryId: "rayon-karasuu",
     libraryName: "Кара-Суйская районная библиотека",
+    region: "Ош облусу",
     image: Userimg,
   },
   {
@@ -39,11 +42,11 @@ export const MOCK_USERS = [
     role: 4,
     libraryId: "lib-balanceva",
     libraryName: "Баланчаева а. китепкана",
+    region: "Ош облусу",
     image: Userimg,
   },
 ];
 
-// --- ПОЛЬЗОВАТЕЛИ ---
 export const getRegisteredUsers = () => {
   try {
     return JSON.parse(localStorage.getItem("registeredUsers") || "[]");
@@ -62,7 +65,6 @@ export const getAllUsers = () => {
   return [...MOCK_USERS, ...getRegisteredUsers()];
 };
 
-// --- БИБЛИОТЕКИ ---
 export const getLibraries = () => {
   try {
     return JSON.parse(localStorage.getItem("librariesList") || "[]");

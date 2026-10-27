@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Library } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Library, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AnimatedSearch from "../components/AnimatedSearch";
 import { useLanguage } from "../context/LanguageContext";
+import { getLibraries } from "../utils/mockUsers"; // <-- Импортируем функцию
 
 import bishkekImg from "../assets/images/bishkek.png";
 import batkenImg from "../assets/images/batken.png";
@@ -17,6 +18,12 @@ export const LibrariesPage = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [search, setSearch] = useState("");
+  const [createdLibraries, setCreatedLibraries] = useState([]);
+
+  // Загружаем созданные библиотеки
+  useEffect(() => {
+    setCreatedLibraries(getLibraries());
+  }, []);
 
   const regions = [
     { id: "all", name: t("lib_all"), count: "1,789", image: bishkekImg },
@@ -29,7 +36,9 @@ export const LibrariesPage = () => {
     { id: "issyk-kul", name: t("reg_issyk_kul"), count: "134", image: IKImg },
   ];
 
+  // Фильтруем и области, и созданные библиотеки по поиску
   const filteredRegions = regions.filter((reg) => reg.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredCreated = createdLibraries.filter((lib) => lib.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleRegionClick = (region) => {
     navigate(`/libraries/${region.id}`, { state: { region } });
@@ -51,9 +60,40 @@ export const LibrariesPage = () => {
 
       <AnimatedSearch value={search} onChange={setSearch} />
 
+      {/* БЛОК СОЗДАННЫХ БИБЛИОТЕК */}
+      {filteredCreated.length > 0 && (
+        <div className="mt-6 mb-8">
+          <h3 className="mb-3 text-sm font-semibold text-[#1C3458] flex items-center gap-2">
+            <PlusCircle size={18} className="text-[#20A35A]" />
+            Жаңы кошулган китепканалар (Созданные вручную)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredCreated.map((lib) => (
+              <div key={lib.id} className="rounded-2xl border border-[#B9E5CC] bg-[#F0FBF4] p-5 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[#20A35A] shadow-sm">
+                    <Library size={20} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#1C3458]">{lib.name}</p>
+                    <p className="text-xs text-[#8992A3]">Тип: {lib.type}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* СТАРЫЙ СПИСОК ОБЛАСТЕЙ */}
+      <h3 className="mb-3 text-sm font-semibold text-[#1C3458]">Области</h3>
       <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
         {filteredRegions.map((reg, index) => (
-          <div key={reg.id} onClick={() => handleRegionClick(reg)} className="group relative flex h-36 cursor-pointer items-center justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div
+            key={reg.id}
+            onClick={() => handleRegionClick(reg)}
+            className="group relative flex h-36 cursor-pointer items-center justify-between overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+          >
             <div className="z-10 flex h-full flex-col justify-between">
               <h3 className="text-lg font-bold text-slate-800">{reg.name}</h3>
               <p className="text-xs text-gray-500">

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, XCircle, FileEdit, AlertCircle } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
-import { useAuth } from "../../context/AuthContext"; // <-- Импортируем авторизацию
-import { getRegisteredUsers, getLibraries } from "../../utils/mockUsers"; // <-- Для проверки иерархии
+import { useAuth } from "../../context/AuthContext";
+import { getRegisteredUsers, getLibraries } from "../../utils/mockUsers";
 
-const STORAGE_KEY = "libraryReports";
+const STORAGE_KEY = "allReports"; // <-- Читаем из allReports
 const EDIT_REQUESTS_KEY = "editRequests";
 
 const EditRequests = () => {
   const { lang, t } = useLanguage();
-  const { user } = useAuth(); // <-- Получаем текущего юзера
+  const { user } = useAuth();
   
   const [requests, setRequests] = useState([]);
   const [reports, setReports] = useState([]);
@@ -23,8 +23,8 @@ const EditRequests = () => {
 
   useEffect(() => {
     const savedRequests = JSON.parse(localStorage.getItem(EDIT_REQUESTS_KEY) || "[]");
-    const savedReports = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    // Собираем все библиотеки (тестовые + созданные), чтобы знать их parentId
+    // ТЕПЕРЬ ЧИТАЕМ ИЗ ОБЩЕГО КЛЮЧА
+    const savedReports = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); 
     const libs = getLibraries();
     setAllLibraries(libs);
     setRequests(savedRequests);
@@ -45,14 +45,20 @@ const EditRequests = () => {
     const request = requests.find((r) => r.id === requestId);
     if (!request) return;
 
-    // Проверка прав: 4-й уровень (и 3-й) не может одобрять
     if (user?.role > 2) {
       showToast("Сизде буга укук жок", "error");
       return;
     }
 
+    // ВРЕМЯ РЕШЕНИЯ (Бишкек)
+    const decidedAt = new Date().toLocaleString("ru-RU", { 
+      timeZone: "Asia/Bishkek", 
+      day: '2-digit', month: '2-digit', year: 'numeric', 
+      hour: '2-digit', minute: '2-digit' 
+    });
+
     const updatedRequests = requests.map((r) =>
-      r.id === requestId ? { ...r, status: decision, decidedAt: new Date().toLocaleString("ru-RU") } : r
+      r.id === requestId ? { ...r, status: decision, decidedAt } : r
     );
     saveRequests(updatedRequests);
 
@@ -68,27 +74,20 @@ const EditRequests = () => {
     showToast(decision === "approved" ? t("edit_req_approved") : t("edit_req_rejected"), decision === "approved" ? "success" : "error");
   };
 
-  // ФИЛЬТРАЦИЯ ЗАПРОСОВ ПО ИЕРАРХИИ
   const getVisibleRequests = (list) => {
     if (!user) return [];
-    if (user.role === 1) return list; // НБКР видит всё
+    if (user.role === 1) return list;
 
     if (user.role === 2) {
-      // Областная видит свои запросы + запросы своих дочерних библиотек
       return list.filter(req => {
         const report = reports.find(r => r.id === req.reportId);
         if (!report) return false;
-        
-        // Если запрос от самой областной библиотеки
         if (report.library === user.libraryName) return true;
-        
-        // Ищем библиотеку, от которой пришел отчет, в списке созданных
         const lib = allLibraries.find(l => l.name === report.library);
         return lib?.parentId === user.libraryId; 
       });
     }
 
-    // 3 и 4 уровень видят только свои запросы (они не могут их одобрять)
     return list.filter(req => {
       const report = reports.find(r => r.id === req.reportId);
       return report?.library === user.libraryName;
@@ -99,7 +98,6 @@ const EditRequests = () => {
   const pending = visibleRequests.filter((r) => r.status === "pending");
   const processed = visibleRequests.filter((r) => r.status !== "pending");
 
-  // Функция для перевода названий
   const translateLibraryName = (name) => {
     if (!name) return name;
     if (lang === "ru") {
@@ -121,7 +119,6 @@ const EditRequests = () => {
           </div>
         </div>
 
-        {/* Если уровень 3 или 4, показываем предупреждение */}
         {user?.role > 2 && (
           <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[#FCD34D] bg-[#FFF7E6] p-4">
             <AlertCircle size={22} className="text-[#D28A00]" />
@@ -151,7 +148,6 @@ const EditRequests = () => {
                       <p className="mt-1 text-xs text-[#8992A3]">{t("edit_req_requested")}: {req.requestedAt}</p>
                     </div>
                     
-                    {/* Кнопки показываем только тем, кто может одобрять */}
                     {user?.role <= 2 ? (
                       <div className="flex gap-2">
                         <button onClick={() => handleDecision(req.id, "approved")} className="flex h-10 items-center gap-2 rounded-lg bg-[#20A35A] px-4 text-sm font-medium text-white transition hover:bg-[#188A4B]">
@@ -162,9 +158,7 @@ const EditRequests = () => {
                         </button>
                       </div>
                     ) : (
-                      <span className="rounded-lg bg-[#FFF7E6] px-3 py-2 text-xs font-medium text-[#B87500]">
-                        Күтүүдө
-                      </span>
+                      <span className="rounded-lg bg-[#FFF7E6] px-3 py-2 text-xs font-medium text-[#B87500]">Күтүүдө</span>
                     )}
                   </div>
                 );

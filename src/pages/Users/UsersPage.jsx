@@ -14,12 +14,10 @@ const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [libraries, setLibraries] = useState([]);
 
-  // Поля для создания
   const [libName, setLibName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Определяем, какой уровень создаем (1-й создает 2-й, 2-й создает 3-й)
   const targetRole = user?.role === 1 ? 2 : 3;
   const targetRoleName = targetRole === 2 ? "Областная" : "Районная";
 
@@ -34,17 +32,21 @@ const UsersPage = () => {
 
     const newLibraryId = `lib-${Date.now()}`;
 
+    // Определяем регион: если создает НБКР (1 ур.), регион = названию библиотеки. 
+    // Если областная (2 ур.) — регион = региону создателя.
+    const newRegion = user?.role === 1 ? libName : (user?.region || "Белгисиз");
+
     // 1. Создаем саму библиотеку
     const newLibrary = {
       id: newLibraryId,
       name: libName,
       type: targetRoleName,
       parentId: user?.libraryId || "nbkr-main",
-      region: user?.role === 1 ? libName : "Область",
+      region: newRegion, 
     };
     addLibrary(newLibrary);
 
-    // 2. Создаем ГЛАВНЫЙ аккаунт для этой библиотеки
+    // 2. Создаем ГЛАВНЫЙ аккаунт
     const mainAccount = {
       id: Date.now(),
       email,
@@ -54,16 +56,14 @@ const UsersPage = () => {
       role: targetRole,
       libraryId: newLibraryId,
       libraryName: libName,
+      region: newRegion, // <-- Сохраняем регион в аккаунт
       isMain: true,
       image: "",
     };
     addRegisteredUser(mainAccount);
 
-    // Обновляем списки на экране
     setUsers(getRegisteredUsers());
     setLibraries(getLibraries());
-    
-    // Очищаем форму
     setLibName(""); setEmail(""); setPassword("");
   };
 
@@ -82,7 +82,6 @@ const UsersPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ФОРМА СОЗДАНИЯ БИБЛИОТЕКИ */}
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-[#E3E8EF]">
           <h2 className="mb-4 text-lg font-semibold text-[#1C3458] flex items-center gap-2">
             <ShieldCheck size={20} className="text-[#20A35A]" />
@@ -119,7 +118,6 @@ const UsersPage = () => {
           </form>
         </div>
 
-        {/* СПИСКИ */}
         <div className="space-y-6">
           <div className="rounded-2xl bg-white p-6 shadow-sm border border-[#E3E8EF]">
             <h2 className="mb-4 text-lg font-semibold text-[#1C3458]">Созданные библиотеки</h2>
@@ -131,7 +129,7 @@ const UsersPage = () => {
                   <div key={lib.id} className="flex items-center justify-between rounded-xl border border-[#E3E8EF] bg-[#FAFBFC] p-4">
                     <div>
                       <p className="font-medium text-[#1C3458]">{lib.name}</p>
-                      <p className="text-xs text-[#8992A3]">Тип: {lib.type}</p>
+                      <p className="text-xs text-[#8992A3]">Тип: {lib.type} · Регион: {lib.region}</p>
                     </div>
                   </div>
                 ))}

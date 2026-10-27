@@ -19,19 +19,60 @@ import {
   formatNumber,
 } from "../../utils/stats";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
+import { getLibraries } from "../../utils/mockUsers";
 
-const STORAGE_KEY = "libraryReports";
+const STORAGE_KEY = "allReports"; // <-- Читаем из общего ключа
 
 const Stats = () => {
   const { lang, t } = useLanguage();
+  const { user } = useAuth();
+  
   const [reports, setReports] = useState([]);
+  const [allLibraries, setAllLibraries] = useState([]);
   const [period, setPeriod] = useState("all");
 
   useEffect(() => {
+    // Читаем из общего ключа
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     setReports(saved);
+    setAllLibraries(getLibraries());
   }, []);
 
+  // ФИЛЬТРАЦИЯ ПО РОЛЯМ
+  const visibleReports = useMemo(() => {
+    if (!user) return [];
+    if (user.role === 1) return reports; // НБКР видит всё
+    
+    if (user.role === 2) {
+      // Областная видит свои + своих районов
+      return reports.filter(r => {
+        if (r.region === user.region) return true;
+        const lib = allLibraries.find(l => l.name === r.library);
+        return lib?.parentId === user.libraryId;
+      });
+    }
+    
+    // 3 и 4 уровень видят только свои
+    return reports.filter(r => r.library === user.libraryName);
+  }, [reports, user, allLibraries]);
+
+  const filtered = useMemo(() => {
+    if (period === "all") return visibleReports;
+    const now = new Date();
+    const monthsBack = period === "6m" ? 6 : 3;
+    const cutoff = new Date(now.getFullYear(), now.getMonth() - monthsBack, 1);
+    return visibleReports.filter((r) => {
+      const src = r.deadline || r.date;
+      if (!src) return false;
+      return new Date(src) >= cutoff;
+    });
+  }, [visibleReports, period]);
+
+  const kpi = useMemo(() => computeKpi(filtered), [filtered]);
+  const months = useMemo(() => groupByMonth(filtered), [filtered]);
+  
+  // Переводим регионы для таблицы
   const translateRegion = (regionName) => {
     if (!regionName) return regionName;
     const regionMap = {
@@ -41,38 +82,24 @@ const Stats = () => {
       "Баткенская область": "reg_batken", "Чуйская область": "reg_chuy", "Джалал-Абадская область": "reg_jalal_abad",
       "Нарынская область": "reg_naryn", "Ошская область": "reg_osh", "Таласская область": "reg_talas",
       "Иссык-Кульская область": "reg_issyk_kul", "город Бишкек": "reg_bishkek", "город Ош": "reg_osh_city",
+      "Кыргызстан": "reg_kyrgyzstan",
     };
     const key = regionMap[regionName];
     return key ? t(key) : regionName;
   };
 
-  const filtered = useMemo(() => {
-    if (period === "all") return reports;
-    const now = new Date();
-    const monthsBack = period === "6m" ? 6 : 3;
-    const cutoff = new Date(now.getFullYear(), now.getMonth() - monthsBack, 1);
-    return reports.filter((r) => {
-      const src = r.deadline || r.date;
-      if (!src) return false;
-      return new Date(src) >= cutoff;
-    });
-  }, [reports, period]);
-
-  const kpi = useMemo(() => computeKpi(filtered), [filtered]);
-  const months = useMemo(() => groupByMonth(filtered), [filtered]);
-  
   const regions = useMemo(() => {
     const rawRegions = groupByRegion(filtered);
     return rawRegions.map(r => ({
       ...r,
       region: translateRegion(r.region)
     }));
-  }, [filtered, lang]);
+  }, [filtered, lang]); 
 
   const statuses = useMemo(() => statusBreakdown(filtered, lang), [filtered, lang]);
   const visitors = useMemo(() => visitorsBreakdown(filtered, lang), [filtered, lang]);
 
-  if (reports.length === 0) {
+  if (visibleReports.length === 0) {
     return (
       <div className="min-h-full bg-[#F3F5F9] px-6 py-6">
         <div className="mx-auto max-w-[1200px]">

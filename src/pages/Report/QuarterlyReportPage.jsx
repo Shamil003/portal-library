@@ -2,25 +2,21 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Wrench, AlertTriangle, CheckCircle2, Monitor, BookOpen, Users, UserRound, Baby, GraduationCap, CalendarDays, Send, Save, AlertCircle, BarChart3, Library, UserCheck, Briefcase, FileText } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
 
-const STORAGE_KEY = "quarterlyReports";
+const STORAGE_KEY = "allReports";
 const DRAFT_KEY = "quarterlyReportDraft";
 const EDITING_KEY = "editingQuarterlyReport";
 
 const QuarterlyReportPage = () => {
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
+  const { user } = useAuth();
 
-  // Функция перевода названия библиотеки
   const translateLibraryName = (name) => {
     if (!name) return name;
     if (lang === "ru") {
-      return name
-        .replace(/китепкана/gi, "библиотека")
-        .replace(/Китепкана/gi, "Библиотека")
-        .replace(/борбордук/gi, "центральная")
-        .replace(/Борбордук/gi, "Центральная")
-        .replace(/райондук/gi, "районная");
+      return name.replace(/китепкана/gi, "библиотека").replace(/Китепкана/gi, "Библиотека").replace(/борбордук/gi, "центральная").replace(/Борбордук/gi, "Центральная").replace(/райондук/gi, "районная").replace(/району/gi, "района");
     }
     return name;
   };
@@ -58,28 +54,17 @@ const QuarterlyReportPage = () => {
     try {
       const report = JSON.parse(editingReport);
       const newForm = { ...initialFormState };
-      Object.keys(initialFormState).forEach((key) => {
-        newForm[key] = String(report[key] ?? "");
-      });
+      Object.keys(initialFormState).forEach((key) => { newForm[key] = String(report[key] ?? ""); });
       setForm(newForm);
-    } catch (error) {
-      console.error("Ошибка загрузки:", error);
-    }
+    } catch (error) { console.error("Ошибка загрузки:", error); }
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value !== "" && !/^\d+$/.test(value)) return;
     setForm((prev) => ({ ...prev, [name]: value }));
-    setSaved(false);
-    setSent(false);
-    if (value.trim() !== "") {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
+    setSaved(false); setSent(false);
+    if (value.trim() !== "") { setErrors((prev) => { const n = { ...prev }; delete n[name]; return n; }); }
   };
 
   const handleSave = () => {
@@ -90,16 +75,11 @@ const QuarterlyReportPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    Object.entries(form).forEach(([name, value]) => {
-      if (value.trim() === "") newErrors[name] = true;
-    });
+    Object.entries(form).forEach(([name, value]) => { if (value.trim() === "") newErrors[name] = true; });
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       const firstError = Object.keys(newErrors)[0];
-      setTimeout(() => {
-        inputRefs.current[firstError]?.scrollIntoView({ behavior: "smooth", block: "center" });
-        inputRefs.current[firstError]?.focus();
-      }, 100);
+      setTimeout(() => { inputRefs.current[firstError]?.scrollIntoView({ behavior: "smooth", block: "center" }); inputRefs.current[firstError]?.focus(); }, 100);
       return false;
     }
     return true;
@@ -108,19 +88,25 @@ const QuarterlyReportPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) { setSent(false); return; }
-    setLoading(true);
-    setSent(false);
+    setLoading(true); setSent(false);
     try {
       const editingReport = localStorage.getItem(EDITING_KEY);
       const oldReport = editingReport ? JSON.parse(editingReport) : null;
 
+      // ФОРМИРУЕМ ДАТУ С ВРЕМЕНЕМ (Бишкек)
+      const now = new Date().toLocaleString("ru-RU", { 
+        timeZone: "Asia/Bishkek",
+        day: '2-digit', month: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit' 
+      });
+
       const report = {
         id: oldReport?.id || Date.now(),
         type: "quarterly",
-        library: oldReport?.library || "Баланчаева а. китепкана",
-        region: oldReport?.region || "Ош облусу",
+        library: oldReport?.library || user?.libraryName || "Баланчаева а. китепкана",
+        region: oldReport?.region || user?.region || "Белгисиз",
         period: oldReport?.period || "IV квартал 2026",
-        date: new Date().toLocaleDateString("ru-RU"),
+        date: now, // <-- Время и дата
         status: "Отправлен",
         editRequest: null,
         ...form
@@ -140,23 +126,17 @@ const QuarterlyReportPage = () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
       setSent(true);
       setTimeout(() => navigate("/reports"), 1000);
-    } catch (error) {
-      console.error("Ошибка отправки:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error("Ошибка:", error); } finally { setLoading(false); }
   };
 
   return (
     <>
       <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.06)] md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF7E6]">
-            <BarChart3 size={24} className="text-[#B87500]" />
-          </div>
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF7E6]"><BarChart3 size={24} className="text-[#B87500]" /></div>
           <div>
             <h1 className="text-[22px] font-semibold text-[#1C3458]">{t("form_quarterly")}</h1>
             <p className="mt-1 text-sm text-[#8A93A3]">{t("form_quarterly_desc")}</p>
@@ -173,14 +153,10 @@ const QuarterlyReportPage = () => {
 
       <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EAF1FA]">
-            <BookOpen size={20} className="text-[#1C3458]" />
-          </div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EAF1FA]"><BookOpen size={20} className="text-[#1C3458]" /></div>
           <div>
             <p className="text-xs text-[#8992A3]">{t("form_library")}</p>
-            <p className="font-medium text-[#1C3458]">
-              {translateLibraryName("Баланчаева а. китепкана")}
-            </p>
+            <p className="font-medium text-[#1C3458]">{translateLibraryName(user?.libraryName || "Баланчаева а. китепкана")}</p>
           </div>
         </div>
       </div>
@@ -229,37 +205,27 @@ const QuarterlyReportPage = () => {
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_receivedKyrgyz")} name="receivedKyrgyz" value={form.receivedKyrgyz} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_receivedRussian")} name="receivedRussian" value={form.receivedRussian} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_receivedOther")} name="receivedOther" value={form.receivedOther} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_retiredTotal")} name="retiredTotal" value={form.retiredTotal} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_retiredKyrgyz")} name="retiredKyrgyz" value={form.retiredKyrgyz} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_retiredRussian")} name="retiredRussian" value={form.retiredRussian} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_retiredOther")} name="retiredOther" value={form.retiredOther} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_endTotal")} name="endTotal" value={form.endTotal} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_endKyrgyz")} name="endKyrgyz" value={form.endKyrgyz} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_endRussian")} name="endRussian" value={form.endRussian} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_endOther")} name="endOther" value={form.endOther} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issuedTotal")} name="issuedTotal" value={form.issuedTotal} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issuedKyrgyz")} name="issuedKyrgyz" value={form.issuedKyrgyz} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issuedRussian")} name="issuedRussian" value={form.issuedRussian} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issuedOther")} name="issuedOther" value={form.issuedOther} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<Baby size={18} />} label={t("f_issued15Total")} name="issued15Total" value={form.issued15Total} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issued15Kyrgyz")} name="issued15Kyrgyz" value={form.issued15Kyrgyz} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issued15Russian")} name="issued15Russian" value={form.issued15Russian} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issued15Other")} name="issued15Other" value={form.issued15Other} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<GraduationCap size={18} />} label={t("f_issued21Total")} name="issued21Total" value={form.issued21Total} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issued21Kyrgyz")} name="issued21Kyrgyz" value={form.issued21Kyrgyz} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<BookOpen size={18} />} label={t("f_issued21Russian")} name="issued21Russian" value={form.issued21Russian} onChange={handleChange} />
@@ -270,9 +236,7 @@ const QuarterlyReportPage = () => {
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<Users size={18} />} label={t("f_totalSubscribers")} name="totalSubscribers" value={form.totalSubscribers} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<UserRound size={18} />} label={t("f_individualSubscribers")} name="individualSubscribers" value={form.individualSubscribers} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<Users size={18} />} label={t("f_collectiveSubscribers")} name="collectiveSubscribers" value={form.collectiveSubscribers} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_totalEvents")} name="totalEvents" value={form.totalEvents} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_internationalEvents")} name="internationalEvents" value={form.internationalEvents} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_republicanEvents")} name="republicanEvents" value={form.republicanEvents} onChange={handleChange} />
@@ -285,16 +249,12 @@ const QuarterlyReportPage = () => {
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<UserRound size={18} />} label={t("f_librarianStaff")} name="librarianStaff" value={form.librarianStaff} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<GraduationCap size={18} />} label={t("f_higherEducation")} name="higherEducation" value={form.higherEducation} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<GraduationCap size={18} />} label={t("f_secondaryEducation")} name="secondaryEducation" value={form.secondaryEducation} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_expUpTo5")} name="expUpTo5" value={form.expUpTo5} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_exp5To10")} name="exp5To10" value={form.exp5To10} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_exp10To20")} name="exp10To20" value={form.exp10To20} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<CalendarDays size={18} />} label={t("f_expOver20")} name="expOver20" value={form.expOver20} onChange={handleChange} />
-
           <div className="col-span-full my-2 border-t border-[#E1E6ED]"></div>
-
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<UserRound size={18} />} label={t("f_ageUpTo30")} name="ageUpTo30" value={form.ageUpTo30} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<UserRound size={18} />} label={t("f_age30To55")} name="age30To55" value={form.age30To55} onChange={handleChange} />
           <ReportInput t={t} inputRefs={inputRefs} errors={errors} icon={<UserRound size={18} />} label={t("f_ageOver55")} name="ageOver55" value={form.ageOver55} onChange={handleChange} />
@@ -302,23 +262,15 @@ const QuarterlyReportPage = () => {
 
         <div className="mb-5 rounded-2xl border border-[#E5E9EF] bg-white p-5">
           <div className="flex gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#FFF7E6]">
-              <AlertCircle size={20} className="text-[#D28A00]" />
-            </div>
-            <div>
-              <p className="font-medium text-[#1C3458]">{t("form_warning")}</p>
-              <p className="mt-1 text-sm leading-5 text-[#8992A3]">{t("form_warning_desc")}</p>
-            </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#FFF7E6]"><AlertCircle size={20} className="text-[#D28A00]" /></div>
+            <div><p className="font-medium text-[#1C3458]">{t("form_warning")}</p><p className="mt-1 text-sm leading-5 text-[#8992A3]">{t("form_warning_desc")}</p></div>
           </div>
         </div>
 
         {sent && (
           <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#B9E5CC] bg-[#F0FBF4] p-4">
             <CheckCircle2 size={22} className="text-[#20A35A]" />
-            <div>
-              <p className="font-medium text-[#167A42]">{t("form_success")}</p>
-              <p className="text-sm text-[#4D8A65]">{t("form_success_desc")}</p>
-            </div>
+            <div><p className="font-medium text-[#167A42]">{t("form_success")}</p><p className="text-sm text-[#4D8A65]">{t("form_success_desc")}</p></div>
           </div>
         )}
 
@@ -326,7 +278,6 @@ const QuarterlyReportPage = () => {
           <button type="button" onClick={handleSave} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[#DCE2EA] bg-white px-6 text-sm font-medium text-[#1C3458] transition hover:bg-[#F6F8FB]">
             {saved ? (<><CheckCircle2 size={18} />{t("form_saved")}</>) : (<><Save size={18} />{t("form_save")}</>)}
           </button>
-
           <button type="submit" disabled={loading} className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#1C3458] px-8 text-sm font-medium text-white shadow-[0_4px_12px_rgba(28,52,88,0.2)] transition hover:bg-[#294873] disabled:cursor-not-allowed disabled:opacity-60">
             {loading ? (<><div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />{t("form_sending")}</>) : (<><Send size={18} />{t("form_send")}</>)}
           </button>
@@ -340,10 +291,7 @@ const ReportSection = ({ icon, title, description, children }) => (
   <section className="mb-6 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
     <div className="mb-6 flex items-start gap-3">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EAF1FA] text-[#1C3458]">{icon}</div>
-      <div>
-        <h2 className="text-[18px] font-semibold text-[#1C3458]">{title}</h2>
-        <p className="mt-1 text-sm text-[#8A93A3]">{description}</p>
-      </div>
+      <div><h2 className="text-[18px] font-semibold text-[#1C3458]">{title}</h2><p className="mt-1 text-sm text-[#8A93A3]">{description}</p></div>
     </div>
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">{children}</div>
   </section>
@@ -353,13 +301,8 @@ const ReportInput = ({ icon, label, name, value, onChange, errors, inputRefs, t 
   const hasError = Boolean(errors[name]);
   return (
     <div className={`group rounded-xl border p-4 transition-all duration-200 ${hasError ? "border-red-400 bg-red-50/50 shadow-[0_0_0_3px_rgba(239,68,68,0.08)]" : "border-[#E1E6ED] bg-[#FAFBFC]"} focus-within:bg-white ${hasError ? "focus-within:border-red-500" : "focus-within:border-[#1C3458]"}`}>
-      <label htmlFor={name} className={`mb-3 flex items-center gap-2 text-sm font-medium ${hasError ? "text-red-600" : "text-[#48556A]"}`}>
-        <span className={hasError ? "text-red-500" : "text-[#1C3458]"}>{icon}</span>
-        {label}
-      </label>
-      <input ref={(element) => { inputRefs.current[name] = element; }} id={name} name={name} type="text" inputMode="numeric" placeholder="0" value={value} onChange={onChange} aria-invalid={hasError}
-        className={`h-12 w-full rounded-lg border bg-white px-4 text-[18px] font-semibold outline-none transition ${hasError ? "border-red-400 text-red-700 placeholder:text-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/10" : "border-[#DDE3EA] text-[#1C3458] placeholder:text-[#B8C0CC] focus:border-[#1C3458] focus:ring-2 focus:ring-[#1C3458]/10"}`}
-      />
+      <label htmlFor={name} className={`mb-3 flex items-center gap-2 text-sm font-medium ${hasError ? "text-red-600" : "text-[#48556A]"}`}><span className={hasError ? "text-red-500" : "text-[#1C3458]"}>{icon}</span>{label}</label>
+      <input ref={(element) => { inputRefs.current[name] = element; }} id={name} name={name} type="text" inputMode="numeric" placeholder="0" value={value} onChange={onChange} aria-invalid={hasError} className={`h-12 w-full rounded-lg border bg-white px-4 text-[18px] font-semibold outline-none transition ${hasError ? "border-red-400 text-red-700 placeholder:text-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/10" : "border-[#DDE3EA] text-[#1C3458] placeholder:text-[#B8C0CC] focus:border-[#1C3458] focus:ring-2 focus:ring-[#1C3458]/10"}`} />
       {hasError && (<p className="mt-2 flex items-center gap-1 text-xs font-medium text-red-500"><AlertCircle size={14} />{t("form_err_required")}</p>)}
     </div>
   );
