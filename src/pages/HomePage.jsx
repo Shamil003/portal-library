@@ -21,7 +21,7 @@ import {
 } from "../utils/deadline";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext"; 
-import { DirectorCard } from "../components/DirectorCard"; 
+// import { DirectorCard } from "../components/DirectorCard"; 
 
 const REPORTS_KEY = "allReports"; 
 const REQUESTS_KEY = "editRequests";
@@ -77,7 +77,6 @@ export const HomePage = () => {
     }
   }, []);
 
-  // Фильтруем отчеты по роли для отображения статистики на главной
   const visibleReports = useMemo(() => {
     if (!user) return [];
     if (user.role === 1) return reports;
@@ -148,7 +147,7 @@ export const HomePage = () => {
     <div className="space-y-6">
       
       {/* 1. КАРТОЧКА ДИРЕКТОРА */}
-      <DirectorCard />
+      {/* <DirectorCard /> */}
 
       {/* 2. ПРИВЕТСТВИЕ */}
       <div className="rounded-2xl bg-gradient-to-r from-[#1C3458] to-[#3B6EA5] p-6 text-white shadow-[0_4px_20px_rgba(28,52,88,0.15)]">
