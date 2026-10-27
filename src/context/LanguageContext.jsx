@@ -4,7 +4,6 @@ const LanguageContext = createContext();
 
 export const translations = {
   kg: {
-    // ... (твои старые ключи для меню, статистики и т.д. остаются без изменений) ...
     nav_home: "Башкы бет",
     nav_reports: "Отчеттор",
     nav_editRequests: "Редактирлөө сурамдары",
@@ -212,7 +211,6 @@ export const translations = {
     card_info_serv: "Маалымат кызматтары жана",
     card_staff: "Кызматкерлер статистикасы",
 
-    // ФОРМЫ (СЕКЦИИ И ПОЛЯ)
     sec1_title: "Имараттын абалы жана компьютердик техника",
     sec1_desc: "Оңдоо жана компьютердик техниканын болушу",
     sec2_title: "2. Маалыматтык ресурстар",
@@ -294,7 +292,6 @@ export const translations = {
     f_age30To55: "30 дан 55 жашка чейин",
     f_ageOver55: "55 жаш жана андан улуу",
 
-    // РЕГИОНЫ И ЧИСЛА
     reg_batken: "Баткен облусу",
     reg_chuy: "Чүй облусу",
     reg_jalal_abad: "Жалал-Абад облусу",
@@ -308,7 +305,6 @@ export const translations = {
     format_thousand: "миң",
     format_million: "млн",
 
-    // ДИРЕКТОР
     dir_title: "Директор",
     dir_name: "Аттокуров Элдар Эртабылдыевич",
     dir_position: "КР Улуттук китепканасынын директору",
@@ -325,9 +321,9 @@ export const translations = {
     edit_req_lib: "Китепкана",
     edit_req_no_rights:
       "Сиздин дэңгээлиңиз башкалардын сурамдарын жактырууга жеткиликсиз. Сиз өз сурамыңыздын статусун гана көрө аласыз.",
+    reports_overdue: "Мөөнөтү өткөн",
   },
   ru: {
-    // ... (твои старые ключи для меню, статистики и т.д. остаются без изменений) ...
     nav_home: "Главная",
     nav_reports: "Отчеты",
     nav_editRequests: "Запросы на ред.",
@@ -534,7 +530,6 @@ export const translations = {
     card_info_serv: "Информационные услуги и",
     card_staff: "Статистика персонала",
 
-    // ФОРМЫ (СЕКЦИИ И ПОЛЯ)
     sec1_title: "Состояние здания и компьютерная техника",
     sec1_desc: "Ремонт и наличие компьютерной техники",
     sec2_title: "2. Информационные ресурсы",
@@ -617,7 +612,6 @@ export const translations = {
     f_age30To55: "По возрасту от 30 до 55 лет",
     f_ageOver55: "55 лет и старше",
 
-    // РЕГИОНЫ И ЧИСЛА
     reg_batken: "Баткенская область",
     reg_chuy: "Чуйская область",
     reg_jalal_abad: "Джалал-Абадская область",
@@ -631,7 +625,6 @@ export const translations = {
     format_thousand: "тыс",
     format_million: "млн",
 
-    // ДИРЕКТОР
     dir_title: "Директор",
     dir_name: "Аттокуров Элдар Эртабылдыевич",
     dir_position: "Директор Национальной библиотеки КР",
@@ -649,8 +642,10 @@ export const translations = {
     edit_req_no_rights:
       "Ваш уровень доступа не позволяет одобрять чужие запросы. Вы можете видеть только статус своих запросов.",
 
-    nav_deadlines: "Сроки", 
+    nav_deadlines: "Сроки",
     dl_title: "Сроки сдачи отчетов",
+
+    reports_overdue: "Просрочено",
   },
 };
 

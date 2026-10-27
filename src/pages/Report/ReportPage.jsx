@@ -105,7 +105,7 @@ const ReportPage = () => {
         library: oldReport?.library || user?.libraryName || "Борбордук райондук китепкана (Панфилов району)",
         region: oldReport?.region || user?.region || "Белгисиз",
         period: oldReport?.period || "9 ай 2026",
-        date: now, // <-- Время и дата
+        date: now,
         status: "Отправлен",
         editRequest: null,
       };

@@ -15,6 +15,7 @@ const UsersPage = () => {
   const [libraries, setLibraries] = useState([]);
 
   const [libName, setLibName] = useState("");
+  const [userName, setUserName] = useState(""); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -31,7 +32,6 @@ const UsersPage = () => {
     if (!libName || !email || !password) return;
 
     const newLibraryId = `lib-${Date.now()}`;
-
     const newRegion = user?.role === 1 ? libName : (user?.region || "Белгисиз");
 
     const newLibrary = {
@@ -47,12 +47,12 @@ const UsersPage = () => {
       id: Date.now(),
       email,
       password,
-      name: `Главный (${libName})`,
+      name: userName || `Администратор (${libName})`, 
       position: `Уровень ${targetRole} (Главный)`,
       role: targetRole,
       libraryId: newLibraryId,
       libraryName: libName,
-      region: newRegion, 
+      region: newRegion,
       isMain: true,
       image: "",
     };
@@ -60,7 +60,8 @@ const UsersPage = () => {
 
     setUsers(getRegisteredUsers());
     setLibraries(getLibraries());
-    setLibName(""); setEmail(""); setPassword("");
+    
+    setLibName(""); setUserName(""); setEmail(""); setPassword("");
   };
 
   return (
@@ -95,19 +96,32 @@ const UsersPage = () => {
                 required 
               />
             </div>
-            <div className="p-4 bg-[#FAFBFC] rounded-xl border border-[#E3E8EF]">
-              <p className="text-xs font-medium text-[#8992A3] mb-3">Данные главного аккаунта (создателя)</p>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-[#48556A]">Email (Логин)</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 w-full rounded-lg border p-3 text-sm focus:border-[#1C3458] outline-none" placeholder="chuy@mail.ru" required />
-                </div>
-                <div>
-                  <label className="text-sm text-[#48556A]">Пароль</label>
-                  <input type="text" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 w-full rounded-lg border p-3 text-sm focus:border-[#1C3458] outline-none" placeholder="Придумайте пароль" required />
-                </div>
+            
+            <div className="p-4 bg-[#FAFBFC] rounded-xl border border-[#E3E8EF] space-y-3">
+              <p className="text-xs font-medium text-[#8992A3] mb-1">Данные главного аккаунта</p>
+              
+              <div>
+                <label className="text-sm text-[#48556A]">Имя сотрудника (ФИО)</label>
+                <input 
+                  type="text" 
+                  value={userName} 
+                  onChange={e => setUserName(e.target.value)} 
+                  className="mt-1 w-full rounded-lg border p-3 text-sm focus:border-[#1C3458] outline-none" 
+                  placeholder="Иванов Иван" 
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm text-[#48556A]">Email (Логин)</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 w-full rounded-lg border p-3 text-sm focus:border-[#1C3458] outline-none" placeholder="chuy@mail.ru" required />
+              </div>
+              
+              <div>
+                <label className="text-sm text-[#48556A]">Пароль</label>
+                <input type="text" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 w-full rounded-lg border p-3 text-sm focus:border-[#1C3458] outline-none" placeholder="Придумайте пароль" required />
               </div>
             </div>
+            
             <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1C3458] p-3 text-white transition hover:bg-[#294873]">
               <Plus size={18} /> Создать библиотеку и аккаунт
             </button>
@@ -142,8 +156,8 @@ const UsersPage = () => {
                 {users.map((u) => (
                   <div key={u.id} className="flex items-center justify-between rounded-xl border border-[#E3E8EF] bg-[#FAFBFC] p-4">
                     <div>
-                      <p className="font-medium text-[#1C3458]">{u.libraryName}</p>
-                      <p className="text-xs text-[#8992A3]">{u.email} · {u.position}</p>
+                      <p className="font-medium text-[#1C3458]">{u.name}</p>
+                      <p className="text-xs text-[#8992A3]">{u.email} · {u.libraryName}</p>
                     </div>
                   </div>
                 ))}

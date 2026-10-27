@@ -8,13 +8,12 @@ import { Modal } from "./Modal";
 export const Header = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const { lang, toggleLang, t } = useLanguage();
-  const [isExpanded, setIsExpanded] = useState(false); // Состояние для разворота
+  const [isExpanded, setIsExpanded] = useState(false); 
 
   const handleProfileClick = () => {
     navigate("/profile");
   };
 
-  // Функция для создания заглушки, если нет картинки
   const renderAvatar = () => {
     if (user?.image) {
       return (
@@ -25,7 +24,6 @@ export const Header = ({ user, onLogout }) => {
         />
       );
     }
-    // Если картинки нет — показываем первую букву названия библиотеки
     return (
       <div className="w-10 h-10 rounded-full bg-[#1C3458] text-white flex items-center justify-center font-bold text-lg ring-2 ring-gray-100 transition-all duration-300 group-hover/profile:ring-blue-400 group-hover/profile:scale-105">
         {user?.libraryName ? user.libraryName.charAt(0) : "Б"}
@@ -36,7 +34,6 @@ export const Header = ({ user, onLogout }) => {
   return (
     <header className="flex justify-end items-center gap-4 bg-white px-8 py-4 border-b border-gray-100 shadow-sm -mx-8 -mt-8 mb-8">
       
-      {/* Кнопка переключения языка */}
       <button
         onClick={() => toggleLang(lang === "kg" ? "ru" : "kg")}
         className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-[#1C3458] hover:bg-gray-100 transition"
@@ -56,22 +53,22 @@ export const Header = ({ user, onLogout }) => {
           >
             {renderAvatar()}
             
-            {/* Блок с текстом и кнопкой разворота */}
+            
             <div className="flex items-center gap-2">
               <span 
                 className={`text-base font-semibold text-[#434343] transition-colors duration-300 group-hover/profile:text-blue-600 ${
                   isExpanded ? "whitespace-normal text-left" : "truncate max-w-[200px]"
                 }`}
-                title={user.name} // Показывает полный текст при наведении мыши
+                title={user.name} 
               >
                 {user.name}
               </span>
               
-              {/* Кнопка развернуть/свернуть (только если текст длинный) */}
+              
               {user.name.length > 20 && (
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Чтобы не перекидывало в профиль при клике на стрелку
+                    e.stopPropagation(); 
                     setIsExpanded(!isExpanded);
                   }}
                   className="p-1 rounded-md hover:bg-blue-100 text-blue-500 transition"

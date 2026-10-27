@@ -146,7 +146,6 @@ export const HomePage = () => {
   return (
     <div className="space-y-6">
       
-      {/* <DirectorCard /> */}
 
       <div className="rounded-2xl bg-gradient-to-r from-[#1C3458] to-[#3B6EA5] p-6 text-white shadow-[0_4px_20px_rgba(28,52,88,0.15)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -170,7 +169,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-      {/* 3. KPI-КАРТОЧКИ */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <KpiCard
           icon={<FileText size={20} />}
@@ -208,7 +206,6 @@ export const HomePage = () => {
         />
       </div>
 
-      {/* 4. БЛИЖАЙШИЕ ДЕДЛАЙНЫ И БЫСТРЫЕ ДЕЙСТВИЯ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)] lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
@@ -285,7 +282,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-      {/* 5. ГРАФИК И ПОСЛЕДНИЕ ОТЧЕТЫ */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <div className="mb-5 flex items-center gap-3">
