@@ -19,7 +19,6 @@ const AnotherPage = () => {
 
   const [search, setSearch] = useState("");
 
-  // Функция для перевода названий библиотек на лету
   const translateLibraryName = (name) => {
     if (!name) return name;
     return name
@@ -74,7 +73,6 @@ const AnotherPage = () => {
 
   return (
     <div className="p-6">
-      {/* Хлебные крошки */}
       <div className="mb-6 flex items-center gap-2 text-sm font-medium text-gray-500">
         <span
           onClick={() => navigate("/libraries")}

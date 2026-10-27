@@ -14,7 +14,6 @@ import EditRequests from "../pages/EditRequests/EditRequests";
 import Deadlines from "../pages/Dedlines/Dedlines";
 import Stats from "../pages/Stats/Stats";
 
-// Импортируем новые страницы и защиту
 import UsersPage from "../pages/Users/UsersPage";
 import TasksPage from "../pages/Tasks/TasksPage";
 import { ProtectedRoute } from "../components/ProtectedRoute";
@@ -130,7 +129,6 @@ export const Router = ({ user }) => {
         }
       />
 
-      {/* НОВЫЕ МАРШРУТЫ С ЗАЩИТОЙ */}
       
       <Route
         path="/users"

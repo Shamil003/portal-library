@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import mapSvg from "./img/kg.svg?raw";
 import { useLanguage } from "../../context/LanguageContext";
 
-// Функция, которая возвращает данные регионов с учетом текущего языка
 const getRegionData = (t) => ({
   KGB: { name: t("reg_batken"), label: t("reg_batken").replace(" облусу", "").replace("ская область", ""), color: "#F4A261", libraries: 125, users: 2450, books: 45200 },
   KGC: { name: t("reg_chuy"), label: t("reg_chuy").replace(" облусу", "").replace("ская область", ""), color: "#4EA8DE", libraries: 215, users: 5340, books: 82400 },
@@ -17,7 +16,7 @@ const getRegionData = (t) => ({
 
 export const Map = () => {
   const { t } = useLanguage();
-  const regionData = getRegionData(t); // Получаем переведенные данные
+  const regionData = getRegionData(t); 
 
   const mapRef = useRef(null);
   const mapWrapperRef = useRef(null);
@@ -125,7 +124,6 @@ export const Map = () => {
     };
   }, []);
 
-  // Этот useEffect перерисовывает карту при смене regionData (то есть при смене языка)
   useEffect(() => {
     const container = mapRef.current;
 
@@ -272,7 +270,7 @@ export const Map = () => {
       regionsRef.current = [];
       container.innerHTML = "";
     };
-  }, [regionData]); // Перерисовываем при смене языка
+  }, [regionData]); 
 
   useEffect(() => {
     regionsRef.current.forEach(({ region }) => {

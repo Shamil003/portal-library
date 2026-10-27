@@ -22,7 +22,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import { getLibraries } from "../../utils/mockUsers";
 
-const STORAGE_KEY = "allReports"; // <-- Читаем из общего ключа
+const STORAGE_KEY = "allReports"; 
 
 const Stats = () => {
   const { lang, t } = useLanguage();
@@ -33,19 +33,16 @@ const Stats = () => {
   const [period, setPeriod] = useState("all");
 
   useEffect(() => {
-    // Читаем из общего ключа
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     setReports(saved);
     setAllLibraries(getLibraries());
   }, []);
 
-  // ФИЛЬТРАЦИЯ ПО РОЛЯМ
   const visibleReports = useMemo(() => {
     if (!user) return [];
-    if (user.role === 1) return reports; // НБКР видит всё
+    if (user.role === 1) return reports; 
     
     if (user.role === 2) {
-      // Областная видит свои + своих районов
       return reports.filter(r => {
         if (r.region === user.region) return true;
         const lib = allLibraries.find(l => l.name === r.library);
@@ -53,7 +50,6 @@ const Stats = () => {
       });
     }
     
-    // 3 и 4 уровень видят только свои
     return reports.filter(r => r.library === user.libraryName);
   }, [reports, user, allLibraries]);
 
@@ -72,7 +68,6 @@ const Stats = () => {
   const kpi = useMemo(() => computeKpi(filtered), [filtered]);
   const months = useMemo(() => groupByMonth(filtered), [filtered]);
   
-  // Переводим регионы для таблицы
   const translateRegion = (regionName) => {
     if (!regionName) return regionName;
     const regionMap = {
@@ -112,7 +107,6 @@ const Stats = () => {
   return (
     <div className="min-h-full bg-[#F3F5F9] px-6 py-6">
       <div className="mx-auto max-w-[1200px]">
-        {/* Header */}
         <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.06)] md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF1FA]">
@@ -144,7 +138,6 @@ const Stats = () => {
           </div>
         </div>
 
-        {/* KPI */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard icon={<BarChart3 size={20} />} label={t("stats_total_reports")} value={kpi.total} accent="#1C3458" />
           <KpiCard icon={<CheckCircle2 size={20} />} label={t("stats_on_time")} value={`${kpi.onTimePercent}%`} hint={`${kpi.onTime} / ${kpi.total}`} accent="#20A35A" />
@@ -152,7 +145,6 @@ const Stats = () => {
           <KpiCard icon={<AlertTriangle size={20} />} label={t("stats_overdue")} value={kpi.overdue} accent="#DC2626" />
         </div>
 
-        {/* Второй ряд KPI */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard icon={<Users size={20} />} label={t("stats_users")} value={formatNumber(kpi.users, lang)} accent="#1C3458" />
           <KpiCard icon={<CalendarDays size={20} />} label={t("stats_events")} value={formatNumber(kpi.events, lang)} accent="#F59E0B" />
@@ -160,7 +152,6 @@ const Stats = () => {
           <KpiCard icon={<TrendingUp size={20} />} label={t("stats_regions")} value={regions.length} accent="#20A35A" />
         </div>
 
-        {/* График по месяцам */}
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -171,7 +162,6 @@ const Stats = () => {
           <MonthlyChart data={months} lang={lang} />
         </div>
 
-        {/* Регионы + статусы */}
         <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)] lg:col-span-2">
             <h2 className="mb-1 text-[18px] font-semibold text-[#1C3458]">{t("stats_by_region")}</h2>
@@ -186,14 +176,12 @@ const Stats = () => {
           </div>
         </div>
 
-        {/* Состав посетителей */}
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <h2 className="mb-1 text-[18px] font-semibold text-[#1C3458]">{t("stats_visitors")}</h2>
           <p className="mb-5 text-sm text-[#8992A3]">{t("stats_visitors_desc")}</p>
           <StackedBar data={visitors} t={t} lang={lang} />
         </div>
 
-        {/* Таблица регионов */}
         <div className="rounded-2xl bg-white shadow-[0_2px_12px_rgba(28,52,88,0.05)]">
           <div className="border-b border-[#E7EBF0] px-6 py-5">
             <h2 className="text-[18px] font-semibold text-[#1C3458]">{t("stats_table")}</h2>
@@ -236,9 +224,6 @@ const Stats = () => {
   );
 };
 
-/* =========================
-   Вспомогательные компоненты
-========================= */
 const KpiCard = ({ icon, label, value, hint, accent = "#1C3458" }) => (
   <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5">
     <div className="flex items-center gap-3">

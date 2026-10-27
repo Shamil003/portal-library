@@ -7,7 +7,7 @@ import { getAllUsers } from "../utils/mockUsers";
 
 export const Modal = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { login } = useAuth(); // <-- Берем login из контекста
+  const { login } = useAuth(); 
   const navigate = useNavigate();
   
   const [email, setEmail] = useState("");
@@ -25,8 +25,8 @@ export const Modal = ({ isOpen, onClose }) => {
     );
 
     if (user) {
-      login(user); // Авторизуем
-      onClose(); // Закрываем модалку
+      login(user); 
+      onClose(); 
       setEmail("");
       setPassword("");
       setError("");

@@ -4,7 +4,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import { getRegisteredUsers, getLibraries } from "../../utils/mockUsers";
 
-const STORAGE_KEY = "allReports"; // <-- Читаем из allReports
+const STORAGE_KEY = "allReports"; 
 const EDIT_REQUESTS_KEY = "editRequests";
 
 const EditRequests = () => {
@@ -23,7 +23,6 @@ const EditRequests = () => {
 
   useEffect(() => {
     const savedRequests = JSON.parse(localStorage.getItem(EDIT_REQUESTS_KEY) || "[]");
-    // ТЕПЕРЬ ЧИТАЕМ ИЗ ОБЩЕГО КЛЮЧА
     const savedReports = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); 
     const libs = getLibraries();
     setAllLibraries(libs);
@@ -50,7 +49,6 @@ const EditRequests = () => {
       return;
     }
 
-    // ВРЕМЯ РЕШЕНИЯ (Бишкек)
     const decidedAt = new Date().toLocaleString("ru-RU", { 
       timeZone: "Asia/Bishkek", 
       day: '2-digit', month: '2-digit', year: 'numeric', 

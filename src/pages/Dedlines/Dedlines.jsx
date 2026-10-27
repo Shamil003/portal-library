@@ -26,7 +26,6 @@ const Deadlines = () => {
     setReports(sorted);
   }, []);
 
-  // Функция для перевода названий библиотек и регионов "на лету"
   const translateName = (text, type) => {
     if (!text) return text;
     
@@ -136,9 +135,7 @@ const Deadlines = () => {
                         {dl.status === "overdue" ? <AlertTriangle size={20} /> : <Clock3 size={20} />}
                       </div>
                       <div>
-                        {/* Переводим название библиотеки */}
                         <p className="font-medium text-[#1C3458]">{translateName(report.library, "library")}</p>
-                        {/* Переводим регион */}
                         <p className="mt-1 text-sm text-[#8992A3]">
                           {translateName(report.region, "region")} · {report.period}
                         </p>

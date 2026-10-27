@@ -32,11 +32,8 @@ const UsersPage = () => {
 
     const newLibraryId = `lib-${Date.now()}`;
 
-    // Определяем регион: если создает НБКР (1 ур.), регион = названию библиотеки. 
-    // Если областная (2 ур.) — регион = региону создателя.
     const newRegion = user?.role === 1 ? libName : (user?.region || "Белгисиз");
 
-    // 1. Создаем саму библиотеку
     const newLibrary = {
       id: newLibraryId,
       name: libName,
@@ -46,7 +43,6 @@ const UsersPage = () => {
     };
     addLibrary(newLibrary);
 
-    // 2. Создаем ГЛАВНЫЙ аккаунт
     const mainAccount = {
       id: Date.now(),
       email,
@@ -56,7 +52,7 @@ const UsersPage = () => {
       role: targetRole,
       libraryId: newLibraryId,
       libraryName: libName,
-      region: newRegion, // <-- Сохраняем регион в аккаунт
+      region: newRegion, 
       isMain: true,
       image: "",
     };

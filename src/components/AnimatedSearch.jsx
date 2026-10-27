@@ -7,7 +7,7 @@ const AnimatedSearch = ({ value, onChange }) => {
   const [placeholder, setPlaceholder] = useState("");
 
   useEffect(() => {
-    const text = t("search_ph"); // Берем текст из словаря
+    const text = t("search_ph"); 
     let index = 0;
     let deleting = false;
     let timeout;
@@ -41,7 +41,7 @@ const AnimatedSearch = ({ value, onChange }) => {
     animate();
 
     return () => clearTimeout(timeout);
-  }, [t]); // <-- ВАЖНО: добавили t, чтобы анимация перезапускалась при смене языка
+  }, [t]); 
 
   return (
     <div className="relative mb-6">

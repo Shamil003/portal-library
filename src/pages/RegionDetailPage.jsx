@@ -11,7 +11,6 @@ export const RegionDetailPage = () => {
   const region = location.state?.region;
   const [search, setSearch] = useState("");
 
-  // Функция для перевода названий библиотек на лету
   const translateLibraryName = (name) => {
     if (!name) return name;
     if (lang === "ru") {
@@ -86,7 +85,6 @@ export const RegionDetailPage = () => {
         {filteredLibraries.map((lib) => (
           <div key={lib.id} onClick={() => handleLibraryClick(lib)} className="group flex cursor-pointer items-center justify-between rounded-2xl border border-gray-200 bg-white p-4 px-6 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
             <div className="min-w-[180px]">
-              {/* Применяем функцию перевода к названию библиотеки */}
               <p className="text-sm font-semibold text-slate-800">{translateLibraryName(lib.name)}</p>
             </div>
             <div className="flex items-center gap-4">

@@ -93,7 +93,6 @@ const ReportPage = () => {
       const editingReport = localStorage.getItem("editingReport");
       const oldReport = editingReport ? JSON.parse(editingReport) : null;
 
-      // ФОРМИРУЕМ ДАТУ С ВРЕМЕНЕМ (Бишкек)
       const now = new Date().toLocaleString("ru-RU", { 
         timeZone: "Asia/Bishkek",
         day: '2-digit', month: '2-digit', year: 'numeric', 

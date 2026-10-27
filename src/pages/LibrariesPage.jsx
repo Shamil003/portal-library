@@ -3,7 +3,7 @@ import { Library, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AnimatedSearch from "../components/AnimatedSearch";
 import { useLanguage } from "../context/LanguageContext";
-import { getLibraries } from "../utils/mockUsers"; // <-- Импортируем функцию
+import { getLibraries } from "../utils/mockUsers"; 
 
 import bishkekImg from "../assets/images/bishkek.png";
 import batkenImg from "../assets/images/batken.png";
@@ -20,7 +20,6 @@ export const LibrariesPage = () => {
   const [search, setSearch] = useState("");
   const [createdLibraries, setCreatedLibraries] = useState([]);
 
-  // Загружаем созданные библиотеки
   useEffect(() => {
     setCreatedLibraries(getLibraries());
   }, []);
@@ -36,7 +35,6 @@ export const LibrariesPage = () => {
     { id: "issyk-kul", name: t("reg_issyk_kul"), count: "134", image: IKImg },
   ];
 
-  // Фильтруем и области, и созданные библиотеки по поиску
   const filteredRegions = regions.filter((reg) => reg.name.toLowerCase().includes(search.toLowerCase()));
   const filteredCreated = createdLibraries.filter((lib) => lib.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -60,7 +58,6 @@ export const LibrariesPage = () => {
 
       <AnimatedSearch value={search} onChange={setSearch} />
 
-      {/* БЛОК СОЗДАННЫХ БИБЛИОТЕК */}
       {filteredCreated.length > 0 && (
         <div className="mt-6 mb-8">
           <h3 className="mb-3 text-sm font-semibold text-[#1C3458] flex items-center gap-2">
@@ -85,7 +82,6 @@ export const LibrariesPage = () => {
         </div>
       )}
 
-      {/* СТАРЫЙ СПИСОК ОБЛАСТЕЙ */}
       <h3 className="mb-3 text-sm font-semibold text-[#1C3458]">Области</h3>
       <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
         {filteredRegions.map((reg, index) => (
